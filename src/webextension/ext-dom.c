@@ -1,8 +1,9 @@
-#include <glib.h>
-#include <webkitdom/webkitdom.h>
+#include "ext-dom.h"
 
 #include "ext-main.h"
-#include "ext-dom.h"
+
+#include <glib.h>
+#include <webkitdom/webkitdom.h>
 
 static gboolean is_element_visible(WebKitDOMHTMLElement *element);
 

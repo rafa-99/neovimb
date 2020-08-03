@@ -1,87 +1,88 @@
-#include <string.h>
+#include "../include/handler.h"
 
 #include "../include/main.h"
-#include "../include/handler.h"
 #include "../include/util.h"
+
+#include <string.h>
 
 extern struct Neovimb vb;
 
 struct handler {
-    GHashTable *table;  /* holds the protocol handlers */
+	GHashTable *table;  /* holds the protocol handlers */
 };
 
 static char *handler_lookup(Handler *h, const char *uri);
 
 Handler *handler_new(void)
 {
-    Handler *h = g_new(Handler, 1);
-    h->table   = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	Handler *h = g_new(Handler, 1);
+	h->table   = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 
-    return h;
+	return h;
 }
 
 void handler_free(Handler *h)
 {
-    if (h->table) {
-        g_hash_table_destroy(h->table);
-        h->table = NULL;
-    }
-    g_free(h);
+	if (h->table) {
+		g_hash_table_destroy(h->table);
+		h->table = NULL;
+	}
+	g_free(h);
 }
 
 gboolean handler_add(Handler *h, const char *key, const char *cmd)
 {
-    g_hash_table_insert(h->table, g_strdup(key), g_strdup(cmd));
+	g_hash_table_insert(h->table, g_strdup(key), g_strdup(cmd));
 
-    return TRUE;
+	return TRUE;
 }
 
 gboolean handler_remove(Handler *h, const char *key)
 {
-    return g_hash_table_remove(h->table, key);
+	return g_hash_table_remove(h->table, key);
 }
 
 gboolean handler_handle_uri(Handler *h, const char *uri)
 {
-    char *handler, *cmd;
-    GError *error = NULL;
-    gboolean res;
+	char *handler, *cmd;
+	GError *error = NULL;
+	gboolean res;
 
-    if (!(handler = handler_lookup(h, uri))) {
-        return FALSE;
-    }
+	if (!(handler = handler_lookup(h, uri))) {
+		return FALSE;
+	}
 
-    cmd = g_strdup_printf(handler, uri);
-    if (!g_spawn_command_line_async(cmd, &error)) {
-        g_warning("Can't run '%s': %s", cmd, error->message);
-        g_clear_error(&error);
-        res = FALSE;
-    } else {
-        res = TRUE;
-    }
+	cmd = g_strdup_printf(handler, uri);
+	if (!g_spawn_command_line_async(cmd, &error)) {
+		g_warning("Can't run '%s': %s", cmd, error->message);
+		g_clear_error(&error);
+		res = FALSE;
+	} else {
+		res = TRUE;
+	}
 
-    g_free(cmd);
-    return res;
+	g_free(cmd);
+	return res;
 }
 
 gboolean handler_fill_completion(Handler *h, GtkListStore *store, const char *input)
 {
-    GList *src     = g_hash_table_get_keys(h->table);
-    gboolean found = util_fill_completion(store, input, src);
-    g_list_free(src);
+	GList *src     = g_hash_table_get_keys(h->table);
+	gboolean found = util_fill_completion(store, input, src);
+	g_list_free(src);
 
-    return found;
+	return found;
 }
 
 static char *handler_lookup(Handler *h, const char *uri)
 {
-    char *p, *schema, *handler = NULL;
+	char *p, *schema, *handler = NULL;
 
-    if ((p = strchr(uri, ':'))) {
-        schema  = g_strndup(uri, p - uri);
-        handler = g_hash_table_lookup(h->table, schema);
-        g_free(schema);
-    }
+	if ((p = strchr(uri, ':'))) {
+		schema  = g_strndup(uri, p - uri);
+		handler = g_hash_table_lookup(h->table, schema);
+		g_free(schema);
+	}
 
-    return handler;
+	return handler;
 }

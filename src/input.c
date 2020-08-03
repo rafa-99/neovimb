@@ -1,20 +1,21 @@
-#include <glib.h>
-#include <glib/gstdio.h>
-#include <string.h>
+#include "../include/input.h"
 
 #include "../include/ascii.h"
 #include "../include/command.h"
 #include "../include/config.h"
-#include "../include/input.h"
+#include "../include/ext-proxy.h"
 #include "../include/main.h"
 #include "../include/normal.h"
 #include "../include/util.h"
 #include "scripts/scripts.h"
-#include "../include/ext-proxy.h"
+
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <string.h>
 
 typedef struct {
-    char   *element_id;
-    unsigned long element_map_key;
+	char   *element_id;
+	unsigned long element_map_key;
 } ElementEditorData;
 
 static void input_editor_formfiller(const char *text, Client *c, gpointer data);
@@ -24,11 +25,11 @@ static void input_editor_formfiller(const char *text, Client *c, gpointer data);
  */
 void input_enter(Client *c)
 {
-    /* switch focus first to make sure we can write to the inputbox without
-     * disturbing the user */
-    gtk_widget_grab_focus(GTK_WIDGET(c->webview));
-    vb_modelabel_update(c, "-- INPUT --");
-    ext_proxy_eval_script(c, "var neovimb_input_mode_element = document.activeElement;", NULL);
+	/* switch focus first to make sure we can write to the inputbox without
+	 * disturbing the user */
+	gtk_widget_grab_focus(GTK_WIDGET(c->webview));
+	vb_modelabel_update(c, "-- INPUT --");
+	ext_proxy_eval_script(c, "var neovimb_input_mode_element = document.activeElement;", NULL);
 }
 
 /**
@@ -36,8 +37,8 @@ void input_enter(Client *c)
  */
 void input_leave(Client *c)
 {
-    ext_proxy_eval_script(c, "neovimb_input_mode_element.blur();", NULL);
-    vb_modelabel_update(c, "");
+	ext_proxy_eval_script(c, "neovimb_input_mode_element.blur();", NULL);
+	vb_modelabel_update(c, "");
 }
 
 /**
@@ -45,129 +46,129 @@ void input_leave(Client *c)
  */
 VbResult input_keypress(Client *c, int key)
 {
-    static gboolean ctrlo = FALSE;
+	static gboolean ctrlo = FALSE;
 
-    if (ctrlo) {
-        /* if we are in ctrl-O mode perform the next keys as normal mode
-         * commands until the command is complete or error */
-        VbResult res = normal_keypress(c, key);
-        if (res != RESULT_MORE) {
-            ctrlo = FALSE;
-            /* Don't overwrite the mode label in case we landed in another
-             * mode. This might occurre by CTRL-0 CTRL-Z or after running ex
-             * command, where we mainly end up in normal mode. */
-            if (c->mode->id == 'i') {
-                /* reenter the input mode */
-                input_enter(c);
-            }
-        }
-        return res;
-    }
+	if (ctrlo) {
+		/* if we are in ctrl-O mode perform the next keys as normal mode
+		 * commands until the command is complete or error */
+		VbResult res = normal_keypress(c, key);
+		if (res != RESULT_MORE) {
+			ctrlo = FALSE;
+			/* Don't overwrite the mode label in case we landed in another
+			 * mode. This might occurre by CTRL-0 CTRL-Z or after running ex
+			 * command, where we mainly end up in normal mode. */
+			if (c->mode->id == 'i') {
+				/* reenter the input mode */
+				input_enter(c);
+			}
+		}
+		return res;
+	}
 
-    switch (key) {
-        case CTRL('['): /* esc */
-            vb_enter(c, 'n');
-            return RESULT_COMPLETE;
+	switch (key) {
+		case CTRL('['): /* esc */
+			vb_enter(c, 'n');
+			return RESULT_COMPLETE;
 
-        case CTRL('O'):
-            /* enter CTRL-0 mode to execute next command in normal mode */
-            ctrlo           = TRUE;
-            c->mode->flags |= FLAG_NOMAP;
-            vb_modelabel_update(c, "-- (input) --");
-            return RESULT_MORE;
+		case CTRL('O'):
+			/* enter CTRL-0 mode to execute next command in normal mode */
+			ctrlo           = TRUE;
+			c->mode->flags |= FLAG_NOMAP;
+			vb_modelabel_update(c, "-- (input) --");
+			return RESULT_MORE;
 
-        case CTRL('T'):
-            return input_open_editor(c);
+		case CTRL('T'):
+			return input_open_editor(c);
 
-        case CTRL('Z'):
-            vb_enter(c, 'p');
-            return RESULT_COMPLETE;
-    }
+		case CTRL('Z'):
+			vb_enter(c, 'p');
+			return RESULT_COMPLETE;
+	}
 
-    c->state.processed_key = FALSE;
-    return RESULT_ERROR;
+	c->state.processed_key = FALSE;
+	return RESULT_ERROR;
 }
 
 VbResult input_open_editor(Client *c)
 {
-    static unsigned long element_map_key = 0;
-    char *element_id = NULL;
-    char *text = NULL, *id = NULL;
-    gboolean success;
-    GVariant *jsreturn;
-    GVariant *idreturn;
-    ElementEditorData *data = NULL;
+	static unsigned long element_map_key = 0;
+	char *element_id = NULL;
+	char *text = NULL, *id = NULL;
+	gboolean success;
+	GVariant *jsreturn;
+	GVariant *idreturn;
+	ElementEditorData *data = NULL;
 
-    g_assert(c);
+	g_assert(c);
 
-    /* get the selected input element */
-    jsreturn = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.value");
-    g_variant_get(jsreturn, "(bs)", &success, &text);
+	/* get the selected input element */
+	jsreturn = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.value");
+	g_variant_get(jsreturn, "(bs)", &success, &text);
 
-    if (!success || !text) {
-        return RESULT_ERROR;
-    }
+	if (!success || !text) {
+		return RESULT_ERROR;
+	}
 
-    idreturn = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.id");
-    g_variant_get(idreturn, "(bs)", &success, &id);
+	idreturn = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.id");
+	g_variant_get(idreturn, "(bs)", &success, &id);
 
-    /* Special case: the input element does not have an id assigned to it */
-    if (!success || !*id) {
-        char *js_command = g_strdup_printf(JS_SET_EDITOR_MAP_ELEMENT, ++element_map_key);
-        ext_proxy_eval_script(c, js_command, NULL);
-        g_free(js_command);
-    } else {
-        element_id = g_strdup(id);
-    }
+	/* Special case: the input element does not have an id assigned to it */
+	if (!success || !*id) {
+		char *js_command = g_strdup_printf(JS_SET_EDITOR_MAP_ELEMENT, ++element_map_key);
+		ext_proxy_eval_script(c, js_command, NULL);
+		g_free(js_command);
+	} else {
+		element_id = g_strdup(id);
+	}
 
-    data                    = g_slice_new0(ElementEditorData);
-    data->element_id        = element_id;
-    data->element_map_key   = element_map_key;
+	data                    = g_slice_new0(ElementEditorData);
+	data->element_id        = element_id;
+	data->element_map_key   = element_map_key;
 
-    if (command_spawn_editor(c, &((Arg){0, text}), input_editor_formfiller, data)) {
-        /* disable the active element */
-        ext_proxy_lock_input(c, element_id);
+	if (command_spawn_editor(c, &((Arg){0, text}), input_editor_formfiller, data)) {
+		/* disable the active element */
+		ext_proxy_lock_input(c, element_id);
 
-        return RESULT_COMPLETE;
-    }
+		return RESULT_COMPLETE;
+	}
 
-    g_free(element_id);
-    g_slice_free(ElementEditorData, data);
-    return RESULT_ERROR;
+	g_free(element_id);
+	g_slice_free(ElementEditorData, data);
+	return RESULT_ERROR;
 }
 
 static void input_editor_formfiller(const char *text, Client *c, gpointer data)
 {
-    char *escaped;
-    char *jscode;
-    char *jscode_enable;
-    ElementEditorData *eed = (ElementEditorData *)data;
+	char *escaped;
+	char *jscode;
+	char *jscode_enable;
+	ElementEditorData *eed = (ElementEditorData *)data;
 
-    if (text) {
-        escaped = util_strescape(text, NULL);
+	if (text) {
+		escaped = util_strescape(text, NULL);
 
-        /* put the text back into the element */
-        if (eed->element_id && strlen(eed->element_id) > 0) {
-            jscode = g_strdup_printf("document.getElementById(\"%s\").value=\"%s\"", eed->element_id, escaped);
-        } else {
-            jscode = g_strdup_printf("neovimb_editor_map.get(\"%lu\").value=\"%s\"", eed->element_map_key, escaped);
-        }
+		/* put the text back into the element */
+		if (eed->element_id && strlen(eed->element_id) > 0) {
+			jscode = g_strdup_printf("document.getElementById(\"%s\").value=\"%s\"", eed->element_id, escaped);
+		} else {
+			jscode = g_strdup_printf("neovimb_editor_map.get(\"%lu\").value=\"%s\"", eed->element_map_key, escaped);
+		}
 
-        ext_proxy_eval_script(c, jscode, NULL);
+		ext_proxy_eval_script(c, jscode, NULL);
 
-        g_free(jscode);
-        g_free(escaped);
-    }
+		g_free(jscode);
+		g_free(escaped);
+	}
 
-    if (eed->element_id && strlen(eed->element_id) > 0) {
-        ext_proxy_unlock_input(c, eed->element_id);
-    } else {
-        jscode_enable = g_strdup_printf(JS_FOCUS_EDITOR_MAP_ELEMENT,
-                eed->element_map_key, eed->element_map_key);
-        ext_proxy_eval_script(c, jscode_enable, NULL);
-        g_free(jscode_enable);
-    }
+	if (eed->element_id && strlen(eed->element_id) > 0) {
+		ext_proxy_unlock_input(c, eed->element_id);
+	} else {
+		jscode_enable = g_strdup_printf(JS_FOCUS_EDITOR_MAP_ELEMENT,
+				eed->element_map_key, eed->element_map_key);
+		ext_proxy_eval_script(c, jscode_enable, NULL);
+		g_free(jscode_enable);
+	}
 
-    g_free(eed->element_id);
-    g_slice_free(ElementEditorData, eed);
+	g_free(eed->element_id);
+	g_slice_free(ElementEditorData, eed);
 }

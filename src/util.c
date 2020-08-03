@@ -1,21 +1,22 @@
+#include "../include/util.h"
+
+#include "../include/ascii.h"
+#include "../include/completion.h"
+
+#include <JavaScriptCore/JavaScript.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <JavaScriptCore/JavaScript.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/file.h>
 #include <unistd.h>
 
-#include "../include/ascii.h"
-#include "../include/completion.h"
-#include "../include/util.h"
-
 static struct {
-    char    *config_dir;
+	char    *config_dir;
 } util;
 
 extern struct Neovimb vb;
@@ -31,47 +32,47 @@ static gboolean match_list(const char *pattern, int patlen, const char *subject)
  */
 char *util_build_path(const char *path, const char *dir)
 {
-    char *fullPath = NULL, *fexp, *dexp, *p;
-    int expflags   = UTIL_EXP_TILDE|UTIL_EXP_DOLLAR;
+	char *fullPath = NULL, *fexp, *dexp, *p;
+	int expflags   = UTIL_EXP_TILDE|UTIL_EXP_DOLLAR;
 
-    /* if the path could be expanded */
-    if ((fexp = util_expand(path, expflags))) {
-        if (*fexp == '/') {
-            /* path is already absolute, no need to use given dir - there is
-             * no need to free fexp, because this should be done by the caller
-             * on fullPath later */
-            fullPath = fexp;
-        } else if (dir && *dir) {
-            /* try to expand also the dir given - this may be ~/path */
-            if ((dexp = util_expand(dir, expflags))) {
-                /* use expanded dir and append expanded path */
-                fullPath = g_build_filename(dexp, fexp, NULL);
-                g_free(dexp);
-            }
-            g_free(fexp);
-        }
-    }
+	/* if the path could be expanded */
+	if ((fexp = util_expand(path, expflags))) {
+		if (*fexp == '/') {
+			/* path is already absolute, no need to use given dir - there is
+			 * no need to free fexp, because this should be done by the caller
+			 * on fullPath later */
+			fullPath = fexp;
+		} else if (dir && *dir) {
+			/* try to expand also the dir given - this may be ~/path */
+			if ((dexp = util_expand(dir, expflags))) {
+				/* use expanded dir and append expanded path */
+				fullPath = g_build_filename(dexp, fexp, NULL);
+				g_free(dexp);
+			}
+			g_free(fexp);
+		}
+	}
 
-    /* if full path not found use current dir */
-    if (!fullPath) {
-        fullPath = g_build_filename(g_get_current_dir(), path, NULL);
-    }
+	/* if full path not found use current dir */
+	if (!fullPath) {
+		fullPath = g_build_filename(g_get_current_dir(), path, NULL);
+	}
 
-    /* Create the directory part of the path if it does not exists. */
-    if ((p = strrchr(fullPath, '/'))) {
-        gboolean res;
-        *p = '\0';
-        res = util_create_dir_if_not_exists(fullPath);
-        *p = '/';
+	/* Create the directory part of the path if it does not exists. */
+	if ((p = strrchr(fullPath, '/'))) {
+		gboolean res;
+		*p = '\0';
+		res = util_create_dir_if_not_exists(fullPath);
+		*p = '/';
 
-        if (!res) {
-            g_free(fullPath);
+		if (!res) {
+			g_free(fullPath);
 
-            return NULL;
-        }
-    }
+			return NULL;
+		}
+	}
 
-    return fullPath;
+	return fullPath;
 }
 
 /**
@@ -79,20 +80,20 @@ char *util_build_path(const char *path, const char *dir)
  */
 void util_cleanup(void)
 {
-    if (util.config_dir) {
-        g_free(util.config_dir);
-    }
+	if (util.config_dir) {
+		g_free(util.config_dir);
+	}
 }
 
 gboolean util_create_dir_if_not_exists(const char *dirpath)
 {
-    if (g_mkdir_with_parents(dirpath, 0755) == -1) {
-        g_critical("Could not create directory '%s': %s", dirpath, g_strerror(errno));
+	if (g_mkdir_with_parents(dirpath, 0755) == -1) {
+		g_critical("Could not create directory '%s': %s", dirpath, g_strerror(errno));
 
-        return FALSE;
-    }
+		return FALSE;
+	}
 
-    return TRUE;
+	return TRUE;
 }
 
 /**
@@ -104,36 +105,36 @@ gboolean util_create_dir_if_not_exists(const char *dirpath)
  */
 gboolean util_create_tmp_file(const char *content, char **file)
 {
-    int fp;
-    ssize_t bytes, len;
+	int fp;
+	ssize_t bytes, len;
 
-    fp = g_file_open_tmp(PROJECT "-XXXXXX", file, NULL);
-    if (fp == -1) {
-        g_critical("Could not create temp file %s", *file);
-        g_free(*file);
-        return FALSE;
-    }
+	fp = g_file_open_tmp(PROJECT "-XXXXXX", file, NULL);
+	if (fp == -1) {
+		g_critical("Could not create temp file %s", *file);
+		g_free(*file);
+		return FALSE;
+	}
 
-    if (content == NULL) {
-        close(fp);
-        return TRUE;
-    }
+	if (content == NULL) {
+		close(fp);
+		return TRUE;
+	}
 
-    len = strlen(content);
+	len = strlen(content);
 
-    /* write content into temporary file */
-    bytes = write(fp, content, len);
-    if (bytes < len) {
-        close(fp);
-        unlink(*file);
-        g_critical("Could not write temp file %s", *file);
-        g_free(*file);
+	/* write content into temporary file */
+	bytes = write(fp, content, len);
+	if (bytes < len) {
+		close(fp);
+		unlink(*file);
+		g_critical("Could not write temp file %s", *file);
+		g_free(*file);
 
-        return FALSE;
-    }
-    close(fp);
+		return FALSE;
+	}
+	close(fp);
 
-    return TRUE;
+	return TRUE;
 }
 
 /**
@@ -144,28 +145,28 @@ gboolean util_create_tmp_file(const char *content, char **file)
  */
 char *util_expand(const char *src, int expflags)
 {
-    const char **input = &src;
-    char *result;
-    GString *dst = g_string_new("");
-    int flags    = expflags;
+	const char **input = &src;
+	char *result;
+	GString *dst = g_string_new("");
+	int flags    = expflags;
 
-    while (**input) {
-        util_parse_expansion(input, dst, flags, "\\");
-        if (VB_IS_SEPARATOR(**input)) {
-            /* after space the tilde expansion is allowed */
-            flags = expflags;
-        } else {
-            /* remove tile expansion for next loop */
-            flags &= ~UTIL_EXP_TILDE;
-        }
-        /* move pointer to the next char */
-        (*input)++;
-    }
+	while (**input) {
+		util_parse_expansion(input, dst, flags, "\\");
+		if (VB_IS_SEPARATOR(**input)) {
+			/* after space the tilde expansion is allowed */
+			flags = expflags;
+		} else {
+			/* remove tile expansion for next loop */
+			flags &= ~UTIL_EXP_TILDE;
+		}
+		/* move pointer to the next char */
+		(*input)++;
+	}
 
-    result = dst->str;
-    g_string_free(dst, FALSE);
+	result = dst->str;
+	g_string_free(dst, FALSE);
 
-    return result;
+	return result;
 }
 
 /**
@@ -176,22 +177,22 @@ char *util_expand(const char *src, int expflags)
  */
 gboolean util_file_append(const char *file, const char *format, ...)
 {
-    va_list args;
-    FILE *f;
+	va_list args;
+	FILE *f;
 
-    if (file && (f = fopen(file, "a+"))) {
-        flock(fileno(f), LOCK_EX);
+	if (file && (f = fopen(file, "a+"))) {
+		flock(fileno(f), LOCK_EX);
 
-        va_start(args, format);
-        vfprintf(f, format, args);
-        va_end(args);
+		va_start(args, format);
+		vfprintf(f, format, args);
+		va_end(args);
 
-        flock(fileno(f), LOCK_UN);
-        fclose(f);
+		flock(fileno(f), LOCK_UN);
+		fclose(f);
 
-        return TRUE;
-    }
-    return FALSE;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 /**
@@ -202,34 +203,34 @@ gboolean util_file_append(const char *file, const char *format, ...)
  */
 gboolean util_file_prepend(const char *file, const char *format, ...)
 {
-    gboolean res = FALSE;
-    va_list args;
-    char *content;
-    FILE *f;
-    if (!file) {
-        return FALSE;
-    }
+	gboolean res = FALSE;
+	va_list args;
+	char *content;
+	FILE *f;
+	if (!file) {
+		return FALSE;
+	}
 
-    content = util_get_file_contents(file, NULL);
-    if ((f = fopen(file, "w"))) {
-        flock(fileno(f), LOCK_EX);
+	content = util_get_file_contents(file, NULL);
+	if ((f = fopen(file, "w"))) {
+		flock(fileno(f), LOCK_EX);
 
-        va_start(args, format);
-        /* write new content to the file */
-        vfprintf(f, format, args);
-        va_end(args);
+		va_start(args, format);
+		/* write new content to the file */
+		vfprintf(f, format, args);
+		va_end(args);
 
-        /* append previous file content */
-        fputs(content, f);
+		/* append previous file content */
+		fputs(content, f);
 
-        flock(fileno(f), LOCK_UN);
-        fclose(f);
+		flock(fileno(f), LOCK_UN);
+		fclose(f);
 
-        res = TRUE;
-    }
-    g_free(content);
+		res = TRUE;
+	}
+	g_free(content);
 
-    return res;
+	return res;
 }
 
 /**
@@ -242,29 +243,29 @@ gboolean util_file_prepend(const char *file, const char *format, ...)
  * @max_lines   Maximum number of lines in file after the operation.
  */
 void util_file_prepend_line(const char *file, const char *line,
-        unsigned int max_lines)
+		unsigned int max_lines)
 {
-    char **lines;
-    GString *new_content;
+	char **lines;
+	GString *new_content;
 
-    g_assert(file);
-    g_assert(line);
+	g_assert(file);
+	g_assert(line);
 
-    lines = util_get_lines(file);
-    /* Write first the new line into the string and append the new line. */
-    new_content = g_string_new(line);
-    g_string_append(new_content, "\n");
-    if (lines) {
-        int len, i;
+	lines = util_get_lines(file);
+	/* Write first the new line into the string and append the new line. */
+	new_content = g_string_new(line);
+	g_string_append(new_content, "\n");
+	if (lines) {
+		int len, i;
 
-        len = g_strv_length(lines);
-        for (i = 0; i < len - 1 && i < max_lines - 1; i++) {
-            g_string_append_printf(new_content, "%s\n", lines[i]);
-        }
-        g_strfreev(lines);
-    }
-    util_file_set_content(file, new_content->str);
-    g_string_free(new_content, TRUE);
+		len = g_strv_length(lines);
+		for (i = 0; i < len - 1 && i < max_lines - 1; i++) {
+			g_string_append_printf(new_content, "%s\n", lines[i]);
+		}
+		g_strfreev(lines);
+	}
+	util_file_set_content(file, new_content->str);
+	g_string_free(new_content, TRUE);
 }
 
 /**
@@ -278,35 +279,35 @@ void util_file_prepend_line(const char *file, const char *line,
  */
 char *util_file_pop_line(const char *file, int *item_count)
 {
-    char **lines;
-    char *new,
-         *line = NULL;
-    int len,
-        count = 0;
+	char **lines;
+	char *new,
+	     *line = NULL;
+	int len,
+	    count = 0;
 
-    if (!file) {
-        return NULL;
-    }
-    lines = util_get_lines(file);
+	if (!file) {
+		return NULL;
+	}
+	lines = util_get_lines(file);
 
-    if (lines) {
-        len = g_strv_length(lines);
-        if (len) {
-            line = g_strdup(lines[0]);
-            /* minus one for last empty item and one for popped item */
-            count = len - 2;
-            new   = g_strjoinv("\n", lines + 1);
-            util_file_set_content(file, new);
-            g_free(new);
-        }
-        g_strfreev(lines);
-    }
+	if (lines) {
+		len = g_strv_length(lines);
+		if (len) {
+			line = g_strdup(lines[0]);
+			/* minus one for last empty item and one for popped item */
+			count = len - 2;
+			new   = g_strjoinv("\n", lines + 1);
+			util_file_set_content(file, new);
+			g_free(new);
+		}
+		g_strfreev(lines);
+	}
 
-    if (item_count) {
-        *item_count = count;
-    }
+	if (item_count) {
+		*item_count = count;
+	}
 
-    return line;
+	return line;
 }
 
 /**
@@ -315,10 +316,10 @@ char *util_file_pop_line(const char *file, int *item_count)
  */
 char *util_get_config_dir(void)
 {
-    char *path = g_build_filename(g_get_user_config_dir(), PROJECT, vb.profile, NULL);
-    create_dir_if_not_exists(path);
+	char *path = g_build_filename(g_get_user_config_dir(), PROJECT, vb.profile, NULL);
+	create_dir_if_not_exists(path);
 
-    return path;
+	return path;
 }
 
 /**
@@ -328,14 +329,14 @@ char *util_get_config_dir(void)
  */
 char *util_get_file_contents(const char *filename, gsize *length)
 {
-    GError *error = NULL;
-    char *content = NULL;
+	GError *error = NULL;
+	char *content = NULL;
 
-    if (filename && !g_file_get_contents(filename, &content, length, &error)) {
-        g_warning("Cannot open %s: %s", filename, error->message);
-        g_error_free(error);
-    }
-    return content;
+	if (filename && !g_file_get_contents(filename, &content, length, &error)) {
+		g_warning("Cannot open %s: %s", filename, error->message);
+		g_error_free(error);
+	}
+	return content;
 }
 
 /**
@@ -344,70 +345,70 @@ char *util_get_file_contents(const char *filename, gsize *length)
  */
 gboolean util_file_set_content(const char *file, const char *contents)
 {
-    gboolean retval = FALSE;
-    char *tmp_name;
-    int fd, mode;
-    gsize length;
-    struct stat st;
+	gboolean retval = FALSE;
+	char *tmp_name;
+	int fd, mode;
+	gsize length;
+	struct stat st;
 
-    mode = 0600;
-    if (stat(file, &st) == 0) {
-        mode = st.st_mode;
-    }
+	mode = 0600;
+	if (stat(file, &st) == 0) {
+		mode = st.st_mode;
+	}
 
-    /* Create a temporary file. */
-    tmp_name = g_strconcat(file, ".XXXXXX", NULL);
-    errno    = 0;
-    fd       = g_mkstemp_full(tmp_name, O_RDWR, mode);
-    length   = strlen(contents);
+	/* Create a temporary file. */
+	tmp_name = g_strconcat(file, ".XXXXXX", NULL);
+	errno    = 0;
+	fd       = g_mkstemp_full(tmp_name, O_RDWR, mode);
+	length   = strlen(contents);
 
-    if (fd == -1) {
-        g_error("Failed to create file %s: %s", tmp_name, g_strerror(errno));
+	if (fd == -1) {
+		g_error("Failed to create file %s: %s", tmp_name, g_strerror(errno));
 
-        goto out;
-    }
+		goto out;
+	}
 
-    /* Write the contents to the temporary file. */
-    while (length > 0) {
-        gssize s;
-        s = write(fd, contents, length);
-        if (s < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
-            g_error("Failed to write to file %s: write() failed: %s",
-                    tmp_name, g_strerror(errno));
-            close(fd);
-            g_unlink(tmp_name);
+	/* Write the contents to the temporary file. */
+	while (length > 0) {
+		gssize s;
+		s = write(fd, contents, length);
+		if (s < 0) {
+			if (errno == EINTR) {
+				continue;
+			}
+			g_error("Failed to write to file %s: write() failed: %s",
+					tmp_name, g_strerror(errno));
+			close(fd);
+			g_unlink(tmp_name);
 
-            goto out;
-        }
+			goto out;
+		}
 
-        g_assert (s <= length);
+		g_assert (s <= length);
 
-        contents += s;
-        length   -= s;
-    }
+		contents += s;
+		length   -= s;
+	}
 
-    if (!g_close(fd, NULL)) {
-        g_unlink(tmp_name);
-        goto out;
-    }
+	if (!g_close(fd, NULL)) {
+		g_unlink(tmp_name);
+		goto out;
+	}
 
-    /* Atomic rename the temporary file into the destination file. */
-    if (g_rename(tmp_name, file) == -1) {
-        g_error("Failed to rename file %s to %s: g_rename() failed: %s",
-                tmp_name, file, g_strerror(errno));
-        g_unlink(tmp_name);
-        goto out;
-    }
+	/* Atomic rename the temporary file into the destination file. */
+	if (g_rename(tmp_name, file) == -1) {
+		g_error("Failed to rename file %s to %s: g_rename() failed: %s",
+				tmp_name, file, g_strerror(errno));
+		g_unlink(tmp_name);
+		goto out;
+	}
 
-    retval = TRUE;
+	retval = TRUE;
 
 out:
-    g_free(tmp_name);
+	g_free(tmp_name);
 
-    return retval;
+	return retval;
 }
 
 /**
@@ -417,19 +418,19 @@ out:
  */
 char **util_get_lines(const char *filename)
 {
-    char *content;
-    char **lines  = NULL;
+	char *content;
+	char **lines  = NULL;
 
-    if (!filename) {
-        return NULL;
-    }
+	if (!filename) {
+		return NULL;
+	}
 
-    if (g_file_get_contents(filename, &content, NULL, NULL)) {
-        /* split the file content into lines */
-        lines = g_strsplit(content, "\n", -1);
-        g_free(content);
-    }
-    return lines;
+	if (g_file_get_contents(filename, &content, NULL, NULL)) {
+		/* split the file content into lines */
+		lines = g_strsplit(content, "\n", -1);
+		g_free(content);
+	}
+	return lines;
 }
 
 /**
@@ -442,67 +443,67 @@ char **util_get_lines(const char *filename)
  *               unlimited items
  */
 GList *util_strv_to_unique_list(char **lines, Util_Content_Func func,
-        guint max_items)
+		guint max_items)
 {
-    char *line;
-    int i, len;
-    GList *gl = NULL;
-    GHashTable *ht;
+	char *line;
+	int i, len;
+	GList *gl = NULL;
+	GHashTable *ht;
 
-    if (!lines) {
-        return NULL;
-    }
+	if (!lines) {
+		return NULL;
+	}
 
-    /* Use the hashtable to check for duplicates in a faster way than by
-     * iterating over the generated list itself. So it's enough to store the
-     * the keys only. */
-    ht = g_hash_table_new(g_str_hash, g_str_equal);
+	/* Use the hashtable to check for duplicates in a faster way than by
+	 * iterating over the generated list itself. So it's enough to store the
+	 * the keys only. */
+	ht = g_hash_table_new(g_str_hash, g_str_equal);
 
-    /* Begin with the last line of the file to make unique check easier -
-     * every already existing item in the table is the latest, so we don't need
-     * to do anything if an item already exists in the hash table. */
-    len = g_strv_length(lines);
-    for (i = len - 1; i >= 0; i--) {
-        char *key, *data;
-        void *item;
+	/* Begin with the last line of the file to make unique check easier -
+	 * every already existing item in the table is the latest, so we don't need
+	 * to do anything if an item already exists in the hash table. */
+	len = g_strv_length(lines);
+	for (i = len - 1; i >= 0; i--) {
+		char *key, *data;
+		void *item;
 
-        line = lines[i];
-        g_strstrip(line);
-        if (!*line) {
-            continue;
-        }
+		line = lines[i];
+		g_strstrip(line);
+		if (!*line) {
+			continue;
+		}
 
-        /* if line contains tab char - separate the line at this */
-        if ((data = strchr(line, '\t'))) {
-            *data = '\0';
-            key   = line;
-            data++;
-        } else {
-            key  = line;
-            data = NULL;
-        }
+		/* if line contains tab char - separate the line at this */
+		if ((data = strchr(line, '\t'))) {
+			*data = '\0';
+			key   = line;
+			data++;
+		} else {
+			key  = line;
+			data = NULL;
+		}
 
-        /* Check if the entry is already in the result list. */
-        if (g_hash_table_lookup_extended(ht, key, NULL, NULL)) {
-            continue;
-        }
+		/* Check if the entry is already in the result list. */
+		if (g_hash_table_lookup_extended(ht, key, NULL, NULL)) {
+			continue;
+		}
 
-        /* Item is new - prepend it to the list. Because the record are read
-         * in reverse order the prepend generates a list in the right order. */
-        if ((item = func(key, data))) {
-            g_hash_table_insert(ht, key, NULL);
-            gl = g_list_prepend(gl, item);
+		/* Item is new - prepend it to the list. Because the record are read
+		 * in reverse order the prepend generates a list in the right order. */
+		if ((item = func(key, data))) {
+			g_hash_table_insert(ht, key, NULL);
+			gl = g_list_prepend(gl, item);
 
-            /* Don't put more entries into the list than requested. */
-            if (max_items && g_hash_table_size(ht) >= max_items) {
-                break;
-            }
-        }
-    }
+			/* Don't put more entries into the list than requested. */
+			if (max_items && g_hash_table_size(ht) >= max_items) {
+				break;
+			}
+		}
+	}
 
-    g_hash_table_destroy(ht);
+	g_hash_table_destroy(ht);
 
-    return gl;
+	return gl;
 }
 
 /**
@@ -510,27 +511,27 @@ GList *util_strv_to_unique_list(char **lines, Util_Content_Func func,
  */
 gboolean util_fill_completion(GtkListStore *store, const char *input, GList *src)
 {
-    gboolean found = FALSE;
-    GtkTreeIter iter;
+	gboolean found = FALSE;
+	GtkTreeIter iter;
 
-    if (!input || !*input) {
-        for (GList *l = src; l; l = l->next) {
-            gtk_list_store_append(store, &iter);
-            gtk_list_store_set(store, &iter, COMPLETION_STORE_FIRST, l->data, -1);
-            found = TRUE;
-        }
-    } else {
-        for (GList *l = src; l; l = l->next) {
-            char *value = (char*)l->data;
-            if (g_str_has_prefix(value, input)) {
-                gtk_list_store_append(store, &iter);
-                gtk_list_store_set(store, &iter, COMPLETION_STORE_FIRST, l->data, -1);
-                found = TRUE;
-            }
-        }
-    }
+	if (!input || !*input) {
+		for (GList *l = src; l; l = l->next) {
+			gtk_list_store_append(store, &iter);
+			gtk_list_store_set(store, &iter, COMPLETION_STORE_FIRST, l->data, -1);
+			found = TRUE;
+		}
+	} else {
+		for (GList *l = src; l; l = l->next) {
+			char *value = (char*)l->data;
+			if (g_str_has_prefix(value, input)) {
+				gtk_list_store_append(store, &iter);
+				gtk_list_store_set(store, &iter, COMPLETION_STORE_FIRST, l->data, -1);
+				found = TRUE;
+			}
+		}
+	}
 
-    return found;
+	return found;
 }
 
 /**
@@ -539,51 +540,51 @@ gboolean util_fill_completion(GtkListStore *store, const char *input, GList *src
  */
 gboolean util_filename_fill_completion(GtkListStore *store, const char *input)
 {
-    gboolean found = FALSE;
-    GError *error  = NULL;
-    char *input_dirname, *real_dirname;
-    const char *last_slash, *input_basename;
-    GDir *dir;
+	gboolean found = FALSE;
+	GError *error  = NULL;
+	char *input_dirname, *real_dirname;
+	const char *last_slash, *input_basename;
+	GDir *dir;
 
-    last_slash     = strrchr(input, '/');
-    input_basename = last_slash ? last_slash + 1 : input;
-    input_dirname  = g_strndup(input, input_basename - input);
-    real_dirname   = util_expand(
-        *input_dirname ? input_dirname : ".",
-        UTIL_EXP_TILDE|UTIL_EXP_DOLLAR
-    );
+	last_slash     = strrchr(input, '/');
+	input_basename = last_slash ? last_slash + 1 : input;
+	input_dirname  = g_strndup(input, input_basename - input);
+	real_dirname   = util_expand(
+			*input_dirname ? input_dirname : ".",
+			UTIL_EXP_TILDE|UTIL_EXP_DOLLAR
+			);
 
-    dir = g_dir_open(real_dirname, 0, &error);
-    if (error) {
-        /* Can't open directory, likely bad user input */
-        g_error_free(error);
-    } else {
-        GtkTreeIter iter;
-        const char *filename;
-        char *fullpath, *result;
+	dir = g_dir_open(real_dirname, 0, &error);
+	if (error) {
+		/* Can't open directory, likely bad user input */
+		g_error_free(error);
+	} else {
+		GtkTreeIter iter;
+		const char *filename;
+		char *fullpath, *result;
 
-        while ((filename = g_dir_read_name(dir))) {
-            if (g_str_has_prefix(filename, input_basename)) {
-                fullpath = g_build_filename(real_dirname, filename, NULL);
-                if (g_file_test(fullpath, G_FILE_TEST_IS_DIR)) {
-                    result = g_strconcat(input_dirname, filename, "/", NULL);
-                } else {
-                    result = g_strconcat(input_dirname, filename, NULL);
-                }
-                g_free(fullpath);
-                gtk_list_store_append(store, &iter);
-                gtk_list_store_set(store, &iter, COMPLETION_STORE_FIRST, result, -1);
-                g_free(result);
-                found = TRUE;
-            }
-        }
-        g_dir_close(dir);
-    }
+		while ((filename = g_dir_read_name(dir))) {
+			if (g_str_has_prefix(filename, input_basename)) {
+				fullpath = g_build_filename(real_dirname, filename, NULL);
+				if (g_file_test(fullpath, G_FILE_TEST_IS_DIR)) {
+					result = g_strconcat(input_dirname, filename, "/", NULL);
+				} else {
+					result = g_strconcat(input_dirname, filename, NULL);
+				}
+				g_free(fullpath);
+				gtk_list_store_append(store, &iter);
+				gtk_list_store_set(store, &iter, COMPLETION_STORE_FIRST, result, -1);
+				g_free(result);
+				found = TRUE;
+			}
+		}
+		g_dir_close(dir);
+	}
 
-    g_free(input_dirname);
-    g_free(real_dirname);
+	g_free(input_dirname);
+	g_free(real_dirname);
 
-    return found;
+	return found;
 }
 
 /**
@@ -592,31 +593,31 @@ gboolean util_filename_fill_completion(GtkListStore *store, const char *input)
  */
 char *util_js_result_as_string(WebKitJavascriptResult *result)
 {
-    JSValueRef value;
-    JSStringRef string;
-    size_t len;
-    char *retval = NULL;
+	JSValueRef value;
+	JSStringRef string;
+	size_t len;
+	char *retval = NULL;
 
-    value  = webkit_javascript_result_get_value(result);
-    string = JSValueToStringCopy(webkit_javascript_result_get_global_context(result),
-                value, NULL);
+	value  = webkit_javascript_result_get_value(result);
+	string = JSValueToStringCopy(webkit_javascript_result_get_global_context(result),
+			value, NULL);
 
-    len = JSStringGetMaximumUTF8CStringSize(string);
-    if (len) {
-        retval = g_malloc(len);
-        JSStringGetUTF8CString(string, retval, len);
-    }
-    JSStringRelease(string);
+	len = JSStringGetMaximumUTF8CStringSize(string);
+	if (len) {
+		retval = g_malloc(len);
+		JSStringGetUTF8CString(string, retval, len);
+	}
+	JSStringRelease(string);
 
-    return retval;
+	return retval;
 }
 
 double util_js_result_as_number(WebKitJavascriptResult *result)
 {
-    JSValueRef value = webkit_javascript_result_get_value(result);
+	JSValueRef value = webkit_javascript_result_get_value(result);
 
-    return JSValueToNumber(webkit_javascript_result_get_global_context(result), value,
-        NULL);
+	return JSValueToNumber(webkit_javascript_result_get_global_context(result), value,
+			NULL);
 }
 
 /**
@@ -636,111 +637,111 @@ double util_js_result_as_number(WebKitJavascriptResult *result)
  * Returns TRUE if input started with expandable pattern.
  */
 gboolean util_parse_expansion(const char **input, GString *str,
-        int flags, const char *quoteable)
+		int flags, const char *quoteable)
 {
-    GString *name;
-    const char *env, *prev, quote = '\\';
-    struct passwd *pwd;
-    gboolean expanded = FALSE;
+	GString *name;
+	const char *env, *prev, quote = '\\';
+	struct passwd *pwd;
+	gboolean expanded = FALSE;
 
-    prev = *input;
-    if (flags & UTIL_EXP_TILDE && **input == '~') {
-        /* skip ~ */
-        (*input)++;
+	prev = *input;
+	if (flags & UTIL_EXP_TILDE && **input == '~') {
+		/* skip ~ */
+		(*input)++;
 
-        if (**input == '/') {
-            g_string_append(str, g_get_home_dir());
-            expanded = TRUE;
-            /* if there is no char or space after ~/ skip the / to get
-             * /home/user instead of /home/user/ */
-            if (!*(*input + 1) || VB_IS_SPACE(*(*input + 1))) {
-                (*input)++;
-            }
-        } else {
-            /* look ahead to / space or end of string to get a possible
-             * username for ~user pattern */
-            name = g_string_new("");
-            /* current char is ~ that is skipped to get the user name */
-            while (VB_IS_IDENT(**input)) {
-                g_string_append_c(name, **input);
-                (*input)++;
-            }
-            /* append the name to the destination string */
-            if ((pwd = getpwnam(name->str))) {
-                g_string_append(str, pwd->pw_dir);
-                expanded = TRUE;
-            }
-            g_string_free(name, TRUE);
-        }
-        /* move pointer back to last expanded char */
-        (*input)--;
-    } else if (flags & UTIL_EXP_DOLLAR && **input == '$') {
-        /* skip the $ */
-        (*input)++;
+		if (**input == '/') {
+			g_string_append(str, g_get_home_dir());
+			expanded = TRUE;
+			/* if there is no char or space after ~/ skip the / to get
+			 * /home/user instead of /home/user/ */
+			if (!*(*input + 1) || VB_IS_SPACE(*(*input + 1))) {
+				(*input)++;
+			}
+		} else {
+			/* look ahead to / space or end of string to get a possible
+			 * username for ~user pattern */
+			name = g_string_new("");
+			/* current char is ~ that is skipped to get the user name */
+			while (VB_IS_IDENT(**input)) {
+				g_string_append_c(name, **input);
+				(*input)++;
+			}
+			/* append the name to the destination string */
+			if ((pwd = getpwnam(name->str))) {
+				g_string_append(str, pwd->pw_dir);
+				expanded = TRUE;
+			}
+			g_string_free(name, TRUE);
+		}
+		/* move pointer back to last expanded char */
+		(*input)--;
+	} else if (flags & UTIL_EXP_DOLLAR && **input == '$') {
+		/* skip the $ */
+		(*input)++;
 
-        name = g_string_new("");
-        /* look for ${VAR}*/
-        if (**input == '{') {
-            /* skip { */
-            (*input)++;
+		name = g_string_new("");
+		/* look for ${VAR}*/
+		if (**input == '{') {
+			/* skip { */
+			(*input)++;
 
-            /* look ahead to } or end of string */
-            while (**input && **input != '}') {
-                g_string_append_c(name, **input);
-                (*input)++;
-            }
-            /* if the } was reached - skip this */
-            if (**input == '}') {
-                (*input)++;
-            }
-        } else { /* process $VAR */
-            /* look ahead to /, space or end of string */
-            while (VB_IS_IDENT(**input)) {
-                g_string_append_c(name, **input);
-                (*input)++;
-            }
-        }
-        /* append the variable to the destination string */
-        if ((env = g_getenv(name->str))) {
-            g_string_append(str, env);
-        }
-        /* move pointer back to last expanded char */
-        (*input)--;
-        /* variable are expanded even if they do not exists */
-        expanded = TRUE;
-        g_string_free(name, TRUE);
-    }
+			/* look ahead to } or end of string */
+			while (**input && **input != '}') {
+				g_string_append_c(name, **input);
+				(*input)++;
+			}
+			/* if the } was reached - skip this */
+			if (**input == '}') {
+				(*input)++;
+			}
+	} else { /* process $VAR */
+		/* look ahead to /, space or end of string */
+		while (VB_IS_IDENT(**input)) {
+			g_string_append_c(name, **input);
+			(*input)++;
+		}
+	}
+	/* append the variable to the destination string */
+	if ((env = g_getenv(name->str))) {
+		g_string_append(str, env);
+	}
+	/* move pointer back to last expanded char */
+	(*input)--;
+	/* variable are expanded even if they do not exists */
+	expanded = TRUE;
+	g_string_free(name, TRUE);
+}
 
-    if (!expanded) {
-        /* restore the pointer position if no expansion was found */
-        *input = prev;
+if (!expanded) {
+	/* restore the pointer position if no expansion was found */
+	*input = prev;
 
-        /* handle escaping of quoteable chars */
-        if (**input == quote) {
-            /* move pointer to the next char */
-            (*input)++;
-            if (!**input) {
-                /* if input ends here - use only the quote char */
-                g_string_append_c(str, quote);
-                (*input)--;
-            } else if (strchr(quoteable, **input)
-                || (flags & UTIL_EXP_TILDE && **input == '~')
-                || (flags & UTIL_EXP_DOLLAR && **input == '$')
-            ) {
-                /* escaped char becomes only char */
-                g_string_append_c(str, **input);
-            } else {
-                /* put escape char and next char into the result string */
-                g_string_append_c(str, quote);
-                g_string_append_c(str, **input);
-            }
-        } else {
-            /* take the char like it is */
-            g_string_append_c(str, **input);
-        }
-    }
+	/* handle escaping of quoteable chars */
+	if (**input == quote) {
+		/* move pointer to the next char */
+		(*input)++;
+		if (!**input) {
+			/* if input ends here - use only the quote char */
+			g_string_append_c(str, quote);
+			(*input)--;
+		} else if (strchr(quoteable, **input)
+				|| (flags & UTIL_EXP_TILDE && **input == '~')
+				|| (flags & UTIL_EXP_DOLLAR && **input == '$')
+			  ) {
+			/* escaped char becomes only char */
+			g_string_append_c(str, **input);
+		} else {
+			/* put escape char and next char into the result string */
+			g_string_append_c(str, quote);
+			g_string_append_c(str, **input);
+		}
+	} else {
+		/* take the char like it is */
+		g_string_append_c(str, **input);
+	}
+}
 
-    return expanded;
+return expanded;
 }
 
 /**
@@ -750,7 +751,7 @@ gboolean util_parse_expansion(const char **input, GString *str,
  */
 char *util_sanitize_filename(char *filename)
 {
-    return g_strdelimit(filename, G_DIR_SEPARATOR_S, '_');
+	return g_strdelimit(filename, G_DIR_SEPARATOR_S, '_');
 }
 
 /**
@@ -760,57 +761,57 @@ char *util_sanitize_filename(char *filename)
  */
 char *util_sanitize_uri(const char *uri_str)
 {
-    SoupURI *uri;
-    char *sanitized_uri;
-    char *for_display;
+	SoupURI *uri;
+	char *sanitized_uri;
+	char *for_display;
 
-    if (!uri_str) {
-        return NULL;
-    }
+	if (!uri_str) {
+		return NULL;
+	}
 #if WEBKIT_CHECK_VERSION(2, 24, 0)
-    for_display = webkit_uri_for_display(uri_str);
-    if (!for_display) {
-        for_display = g_strdup(uri_str);
-    }
+	for_display = webkit_uri_for_display(uri_str);
+	if (!for_display) {
+		for_display = g_strdup(uri_str);
+	}
 #else
-    for_display = g_strdup(uri_str);
+	for_display = g_strdup(uri_str);
 #endif
 
-    /* Sanitize the uri only in case there is a @ which might be the indicator
-     * for credentials used in uri. */
-    if (!strchr(for_display, '@')) {
-        return for_display;
-    }
+	/* Sanitize the uri only in case there is a @ which might be the indicator
+	 * for credentials used in uri. */
+	if (!strchr(for_display, '@')) {
+		return for_display;
+	}
 
-    uri           = soup_uri_new(for_display);
-    sanitized_uri = soup_uri_to_string(uri, FALSE);
-    soup_uri_free(uri);
-    g_free(for_display);
+	uri           = soup_uri_new(for_display);
+	sanitized_uri = soup_uri_to_string(uri, FALSE);
+	soup_uri_free(uri);
+	g_free(for_display);
 
-    return sanitized_uri;
+	return sanitized_uri;
 }
 
 
 char *util_strcasestr(const char *haystack, const char *needle)
 {
-    guchar c1, c2;
-    int i, j;
-    int nlen = strlen(needle);
-    int hlen = strlen(haystack) - nlen + 1;
+	guchar c1, c2;
+	int i, j;
+	int nlen = strlen(needle);
+	int hlen = strlen(haystack) - nlen + 1;
 
-    for (i = 0; i < hlen; i++) {
-        for (j = 0; j < nlen; j++) {
-            c1 = haystack[i + j];
-            c2 = needle[j];
-            if (toupper(c1) != toupper(c2)) {
-                goto next;
-            }
-        }
-        return (char*)haystack + i;
+	for (i = 0; i < hlen; i++) {
+		for (j = 0; j < nlen; j++) {
+			c1 = haystack[i + j];
+			c2 = needle[j];
+			if (toupper(c1) != toupper(c2)) {
+				goto next;
+			}
+		}
+		return (char*)haystack + i;
 next:
-        ;
-    }
-    return NULL;
+		;
+	}
+	return NULL;
 }
 
 /**
@@ -819,15 +820,15 @@ next:
  */
 char *util_str_replace(const char *search, const char *replace, const char *string)
 {
-    if (!string) {
-        return NULL;
-    }
+	if (!string) {
+		return NULL;
+	}
 
-    char **buf = g_strsplit(string, search, -1);
-    char *ret  = g_strjoinv(replace, buf);
-    g_strfreev(buf);
+	char **buf = g_strsplit(string, search, -1);
+	char *ret  = g_strjoinv(replace, buf);
+	g_strfreev(buf);
 
-    return ret;
+	return ret;
 }
 
 /**
@@ -837,50 +838,50 @@ char *util_str_replace(const char *search, const char *replace, const char *stri
  */
 char *util_strescape(const char *source, const char *exceptions)
 {
-    GString *result = g_string_new(NULL);
-    while (TRUE) {
-        char c = *source++;
-        if ('\0' == c) {
-            goto done;
-        }
-        if (exceptions && !strchr(exceptions, c)) {
-            continue;
-        }
-        switch (c) {
-            case '\n':
-                g_string_append(result, "\\n");
-                break;
-            case '\"':
-                g_string_append(result, "\\\"");
-                break;
-            case '\\':
-                g_string_append(result, "\\\\");
-                break;
-            case '\b':
-                g_string_append(result, "\\b");
-                break;
-            case '\f':
-                g_string_append(result, "\\f");
-                break;
-            case '\r':
-                g_string_append(result, "\\r");
-                break;
-            case '\t':
-                g_string_append(result, "\\t");
-                break;
-            default:
-                g_string_append_c(result, c);
-        }
-    }
+	GString *result = g_string_new(NULL);
+	while (TRUE) {
+		char c = *source++;
+		if ('\0' == c) {
+			goto done;
+		}
+		if (exceptions && !strchr(exceptions, c)) {
+			continue;
+		}
+		switch (c) {
+			case '\n':
+				g_string_append(result, "\\n");
+				break;
+			case '\"':
+				g_string_append(result, "\\\"");
+				break;
+			case '\\':
+				g_string_append(result, "\\\\");
+				break;
+			case '\b':
+				g_string_append(result, "\\b");
+				break;
+			case '\f':
+				g_string_append(result, "\\f");
+				break;
+			case '\r':
+				g_string_append(result, "\\r");
+				break;
+			case '\t':
+				g_string_append(result, "\\t");
+				break;
+			default:
+				g_string_append_c(result, c);
+		}
+	}
 done:
-    return g_string_free(result, FALSE);
+	return g_string_free(result, FALSE);
 }
 
 static void create_dir_if_not_exists(const char *dirpath)
 {
-    if (!g_file_test(dirpath, G_FILE_TEST_IS_DIR)) {
-        g_mkdir_with_parents(dirpath, 0755);
-    }
+	if (!g_file_test(dirpath, G_FILE_TEST_IS_DIR)) {
+		g_mkdir_with_parents(dirpath, 0755);
+	}
 }
 
 /**
@@ -895,39 +896,39 @@ static void create_dir_if_not_exists(const char *dirpath)
  */
 gboolean util_wildmatch(const char *pattern, const char *subject)
 {
-    const char *end;
-    int braces, patlen, count;
+	const char *end;
+	int braces, patlen, count;
 
-    /* loop through all pattens */
-    for (count = 0; *pattern; pattern = (*end == ',' ? end + 1 : end), count++) {
-        /* find end of the pattern - but be careful with comma in curly braces */
-        braces = 0;
-        for (end = pattern; *end && (*end != ',' || braces || *(end - 1) == '\\'); ++end) {
-            if (*end == '{') {
-                braces++;
-            } else if (*end == '}') {
-                braces--;
-            }
-        }
-        /* ignore single comma */
-        if (*pattern == *end) {
-            continue;
-        }
-        /* calculate the length of the pattern */
-        patlen = end - pattern;
+	/* loop through all pattens */
+	for (count = 0; *pattern; pattern = (*end == ',' ? end + 1 : end), count++) {
+		/* find end of the pattern - but be careful with comma in curly braces */
+		braces = 0;
+		for (end = pattern; *end && (*end != ',' || braces || *(end - 1) == '\\'); ++end) {
+			if (*end == '{') {
+				braces++;
+			} else if (*end == '}') {
+				braces--;
+			}
+		}
+		/* ignore single comma */
+		if (*pattern == *end) {
+			continue;
+		}
+		/* calculate the length of the pattern */
+		patlen = end - pattern;
 
-        /* if this pattern matches - return */
-        if (match(pattern, patlen, subject)) {
-            return true;
-        }
-    }
+		/* if this pattern matches - return */
+		if (match(pattern, patlen, subject)) {
+			return true;
+		}
+	}
 
-    if (!count) {
-        /* empty pattern matches only on empty subject */
-        return !*subject;
-    }
-    /* there where one or more patterns but none of them matched */
-    return false;
+	if (!count) {
+		/* empty pattern matches only on empty subject */
+		return !*subject;
+	}
+	/* there where one or more patterns but none of them matched */
+	return false;
 }
 
 
@@ -937,75 +938,75 @@ gboolean util_wildmatch(const char *pattern, const char *subject)
  */
 static gboolean match(const char *pattern, int patlen, const char *subject)
 {
-    int i;
-    char sl, pl;
+	int i;
+	char sl, pl;
 
-    while (patlen > 0) {
-        switch (*pattern) {
-            case '?':
-                /* '?' matches a single char except of / and subject end */
-                if (*subject == '/' || !*subject) {
-                    return false;
-                }
-                break;
+	while (patlen > 0) {
+		switch (*pattern) {
+			case '?':
+				/* '?' matches a single char except of / and subject end */
+				if (*subject == '/' || !*subject) {
+					return false;
+				}
+				break;
 
-            case '*':
-                /* easiest case - the '*' ist the last char in pattern - this
-                 * will always match */
-                if (patlen == 1) {
-                    return true;
-                }
-                /* Try to match as much as possible. Try to match the complete
-                 * uri, if that fails move forward in uri and check for a
-                 * match. */
-                i = strlen(subject);
-                while (i >= 0 && !match(pattern + 1, patlen - 1, subject + i)) {
-                    i--;
-                }
-                return i >= 0;
+			case '*':
+				/* easiest case - the '*' ist the last char in pattern - this
+				 * will always match */
+				if (patlen == 1) {
+					return true;
+				}
+				/* Try to match as much as possible. Try to match the complete
+				 * uri, if that fails move forward in uri and check for a
+				 * match. */
+				i = strlen(subject);
+				while (i >= 0 && !match(pattern + 1, patlen - 1, subject + i)) {
+					i--;
+				}
+				return i >= 0;
 
-            case '}':
-                /* spurious '}' in pattern */
-                return false;
+			case '}':
+				/* spurious '}' in pattern */
+				return false;
 
-            case '{':
-                /* possible {foo,bar} pattern */
-                return match_list(pattern, patlen, subject);
+			case '{':
+				/* possible {foo,bar} pattern */
+				return match_list(pattern, patlen, subject);
 
-            case '\\':
-                /* '\' escapes next special char */
-                if (strchr("*?{}", pattern[1])) {
-                    pattern++;
-                    patlen--;
-                    if (*pattern != *subject) {
-                        return false;
-                    }
-                }
-                break;
+			case '\\':
+				/* '\' escapes next special char */
+				if (strchr("*?{}", pattern[1])) {
+					pattern++;
+					patlen--;
+					if (*pattern != *subject) {
+						return false;
+					}
+				}
+				break;
 
-            default:
-                /* compare case insensitive */
-                sl = *subject;
-                if (VB_IS_UPPER(sl)) {
-                    sl += 'a' - 'A';
-                }
-                pl = *pattern;
-                if (VB_IS_UPPER(pl)) {
-                    pl += 'a' - 'A';
-                }
-                if (sl != pl) {
-                    return false;
-                }
-                break;
-        }
-        /* do another loop run with next pattern and subject char */
-        pattern++;
-        patlen--;
-        subject++;
-    }
+			default:
+				/* compare case insensitive */
+				sl = *subject;
+				if (VB_IS_UPPER(sl)) {
+					sl += 'a' - 'A';
+				}
+				pl = *pattern;
+				if (VB_IS_UPPER(pl)) {
+					pl += 'a' - 'A';
+				}
+				if (sl != pl) {
+					return false;
+				}
+				break;
+		}
+		/* do another loop run with next pattern and subject char */
+		pattern++;
+		patlen--;
+		subject++;
+	}
 
-    /* on end of pattern only a also ended subject is a match */
-    return !*subject;
+	/* on end of pattern only a also ended subject is a match */
+	return !*subject;
 }
 
 /**
@@ -1014,73 +1015,73 @@ static gboolean match(const char *pattern, int patlen, const char *subject)
  */
 static gboolean match_list(const char *pattern, int patlen, const char *subject)
 {
-    int endlen;
-    const char *end, *s;
+	int endlen;
+	const char *end, *s;
 
-    /* finde the next none escaped '}' */
-    for (end = pattern, endlen = patlen; endlen > 0 && *end != '}'; end++, endlen--) {
-        /* if escape char - move pointer one additional step */
-        if (*end == '\\') {
-            end++;
-            endlen--;
-        }
-    }
+	/* finde the next none escaped '}' */
+	for (end = pattern, endlen = patlen; endlen > 0 && *end != '}'; end++, endlen--) {
+		/* if escape char - move pointer one additional step */
+		if (*end == '\\') {
+			end++;
+			endlen--;
+		}
+	}
 
-    if (!*end) {
-        /* unterminated '{' in pattern */
-        return false;
-    }
+	if (!*end) {
+		/* unterminated '{' in pattern */
+		return false;
+	}
 
-    s = subject;
-    end++;      /* skip over } */
-    endlen--;
-    pattern++;  /* skip over { */
-    patlen--;
-    while (true) {
-        switch (*pattern) {
-            case ',':
-                if (match(end, endlen, s)) {
-                    return true;
-                }
-                s = subject;
-                pattern++;
-                patlen--;
-                break;
+	s = subject;
+	end++;      /* skip over } */
+	endlen--;
+	pattern++;  /* skip over { */
+	patlen--;
+	while (true) {
+		switch (*pattern) {
+			case ',':
+				if (match(end, endlen, s)) {
+					return true;
+				}
+				s = subject;
+				pattern++;
+				patlen--;
+				break;
 
-            case '}':
-                return match(end, endlen, s);
+			case '}':
+				return match(end, endlen, s);
 
-            case '\\':
-                if (pattern[1] == ',' || pattern[1] == '}' || pattern[1] == '{') {
-                    pattern++;
-                    patlen--;
-                }
-                /* fall through */
+			case '\\':
+				if (pattern[1] == ',' || pattern[1] == '}' || pattern[1] == '{') {
+					pattern++;
+					patlen--;
+				}
+				/* fall through */
 
-            default:
-                if (*pattern == *s) {
-                    pattern++;
-                    patlen--;
-                    s++;
-                } else {
-                    /* this item of the list does not match - move forward to
-                     * the next none escaped ',' or '}' */
-                    s = subject;
-                    for (s = subject; *pattern != ',' && *pattern != '}'; pattern++, patlen--) {
-                        /* if escape char is found - skip next char */
-                        if (*pattern == '\\') {
-                            pattern++;
-                            patlen--;
-                        }
-                    }
-                    /* found ',' skip over it to check the next list item */
-                    if (*pattern == ',') {
-                        pattern++;
-                        patlen--;
-                    }
-                }
-        }
-    }
+			default:
+				if (*pattern == *s) {
+					pattern++;
+					patlen--;
+					s++;
+				} else {
+					/* this item of the list does not match - move forward to
+					 * the next none escaped ',' or '}' */
+					s = subject;
+					for (s = subject; *pattern != ',' && *pattern != '}'; pattern++, patlen--) {
+						/* if escape char is found - skip next char */
+						if (*pattern == '\\') {
+							pattern++;
+							patlen--;
+						}
+					}
+					/* found ',' skip over it to check the next list item */
+					if (*pattern == ',') {
+						pattern++;
+						patlen--;
+					}
+				}
+		}
+	}
 }
 
 /**
@@ -1089,33 +1090,33 @@ static gboolean match_list(const char *pattern, int patlen, const char *subject)
  */
 GTimeSpan util_string_to_timespan(const char *input)
 {
-    unsigned int multiplier = 0;
-    GTimeSpan sum           = 0;
-    gboolean hasmultiplier  = FALSE;
+	unsigned int multiplier = 0;
+	GTimeSpan sum           = 0;
+	gboolean hasmultiplier  = FALSE;
 
-    while (*input) {
-        if (VB_IS_DIGIT(*input)) {
-            multiplier    = multiplier * 10 + (*input - '0');
-            /* Use separate variable to differentiate between no multiplier
-             * set (is same as 1) or ultiplier of '0'. */
-            hasmultiplier = TRUE;
-        } else {
-            GTimeSpan s = 0;
-            switch (*input) {
-                case 'y': s = 365 * G_TIME_SPAN_DAY; break;
-                case 'w': s = 7 * G_TIME_SPAN_DAY; break;
-                case 'd': s = G_TIME_SPAN_DAY; break;
-                case 'h': s = G_TIME_SPAN_HOUR; break;
-                case 'm': s = G_TIME_SPAN_MINUTE; break;
-                case 's': s = G_TIME_SPAN_SECOND; break;
-            }
-            sum += s * (hasmultiplier ? multiplier : 1);
-            /* Unset multiplier for th epossible next multiplier in input */
-            multiplier    = 0;
-            hasmultiplier = FALSE;
-        }
-        input++;
-    }
+	while (*input) {
+		if (VB_IS_DIGIT(*input)) {
+			multiplier    = multiplier * 10 + (*input - '0');
+			/* Use separate variable to differentiate between no multiplier
+			 * set (is same as 1) or ultiplier of '0'. */
+			hasmultiplier = TRUE;
+		} else {
+			GTimeSpan s = 0;
+			switch (*input) {
+				case 'y': s = 365 * G_TIME_SPAN_DAY; break;
+				case 'w': s = 7 * G_TIME_SPAN_DAY; break;
+				case 'd': s = G_TIME_SPAN_DAY; break;
+				case 'h': s = G_TIME_SPAN_HOUR; break;
+				case 'm': s = G_TIME_SPAN_MINUTE; break;
+				case 's': s = G_TIME_SPAN_SECOND; break;
+			}
+			sum += s * (hasmultiplier ? multiplier : 1);
+			/* Unset multiplier for th epossible next multiplier in input */
+			multiplier    = 0;
+			hasmultiplier = FALSE;
+		}
+		input++;
+	}
 
-    return sum;
+	return sum;
 }
