@@ -5,8 +5,8 @@
 #include "main.h"
 
 enum {
-    UTIL_EXP_TILDE   = 0x01, /* ~/ and ~user expansion */
-    UTIL_EXP_DOLLAR  = 0x02, /* $ENV and ${ENV} expansion */
+	UTIL_EXP_TILDE   = 0x01, /* ~/ and ~user expansion */
+	UTIL_EXP_DOLLAR  = 0x02, /* $ENV and ${ENV} expansion */
 };
 typedef void *(*Util_Content_Func)(const char*, const char*);
 
@@ -18,20 +18,20 @@ char *util_expand(const char *src, int expflags);
 gboolean util_file_append(const char *file, const char *format, ...);
 gboolean util_file_prepend(const char *file, const char *format, ...);
 void util_file_prepend_line(const char *file, const char *line,
-        unsigned int max_lines);
+		unsigned int max_lines);
 char *util_file_pop_line(const char *file, int *item_count);
 char *util_get_config_dir(void);
 char *util_get_file_contents(const char *filename, gsize *length);
 gboolean util_file_set_content(const char *file, const char *contents);
 char **util_get_lines(const char *filename);
 GList *util_strv_to_unique_list(char **lines, Util_Content_Func func,
-        guint max_items);
+		guint max_items);
 gboolean util_fill_completion(GtkListStore *store, const char *input, GList *src);
 gboolean util_filename_fill_completion(GtkListStore *store, const char *input);
 char *util_js_result_as_string(WebKitJavascriptResult *result);
 double util_js_result_as_number(WebKitJavascriptResult *result);
 gboolean util_parse_expansion(const char **input, GString *str, int flags,
-        const char *quoteable);
+		const char *quoteable);
 char *util_sanitize_filename(char *filename);
 char *util_sanitize_uri(const char *uri_str);
 char *util_strcasestr(const char *haystack, const char *needle);

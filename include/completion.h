@@ -8,18 +8,18 @@
 typedef void (*CompletionSelectFunc) (Client *c, char *match);
 
 enum {
-    COMPLETION_STORE_FIRST,
+	COMPLETION_STORE_FIRST,
 #ifdef FEATURE_TITLE_IN_COMPLETION
-    COMPLETION_STORE_SECOND,
+	COMPLETION_STORE_SECOND,
 #endif
-    COMPLETION_STORE_NUM
+	COMPLETION_STORE_NUM
 };
 
 
 void completion_clean(Client *c);
 void completion_cleanup(Client *c);
 gboolean completion_create(Client *c, GtkTreeModel *model,
-        CompletionSelectFunc selfunc, gboolean back);
+		CompletionSelectFunc selfunc, gboolean back);
 void completion_init(Client *c);
 gboolean completion_next(Client *c, gboolean back);
 

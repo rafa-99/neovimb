@@ -2,9 +2,9 @@
 #define _MAP_H
 
 typedef enum {
-    MAP_DONE,
-    MAP_AMBIGUOUS,
-    MAP_NOMATCH
+	MAP_DONE,
+	MAP_AMBIGUOUS,
+	MAP_NOMATCH
 } MapState;
 
 void map_init(Client *c);

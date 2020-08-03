@@ -8,16 +8,16 @@
 
 /* this values correspond to indices in events[] array in autocmd.c */
 typedef enum {
-    AU_ALL,
-    AU_LOAD_STARTING,
-    AU_LOAD_STARTED,
-    AU_LOAD_COMMITTED,
-    /*AU_LOAD_FIRST_LAYOUT,*/
-    AU_LOAD_FINISHED,
-    /*AU_LOAD_FAILED,*/
-    AU_DOWNLOAD_STARTED,
-    AU_DOWNLOAD_FINISHED,
-    AU_DOWNLOAD_FAILED,
+	AU_ALL,
+	AU_LOAD_STARTING,
+	AU_LOAD_STARTED,
+	AU_LOAD_COMMITTED,
+	/*AU_LOAD_FIRST_LAYOUT,*/
+	AU_LOAD_FINISHED,
+	/*AU_LOAD_FAILED,*/
+	AU_DOWNLOAD_STARTED,
+	AU_DOWNLOAD_FINISHED,
+	AU_DOWNLOAD_FAILED,
 } AuEvent;
 
 void autocmd_init(Client *c);
