@@ -1,14 +1,14 @@
-#include "../include/file-storage.h"
-
 #include <glib.h>
-#include <glib/gstdio.h>
 #include <stdio.h>
 #include <sys/file.h>
+#include <glib/gstdio.h>
+
+#include "../include/file-storage.h"
 
 struct filestorage {
-	char        *file_path;
-	gboolean    readonly;
-	GString     *str;
+    char        *file_path;
+    gboolean    readonly;
+    GString     *str;
 };
 
 /**
@@ -26,20 +26,20 @@ struct filestorage {
  */
 FileStorage *file_storage_new(const char *dir, const char *filename, gboolean readonly)
 {
-	FileStorage *storage;
+    FileStorage *storage;
 
-	storage            = g_slice_new(FileStorage);
-	storage->readonly  = readonly;
-	storage->file_path = g_build_filename(dir, filename, NULL);
+    storage            = g_slice_new(FileStorage);
+    storage->readonly  = readonly;
+    storage->file_path = g_build_filename(dir, filename, NULL);
 
-	/* Use gstring as storage in case when the file is used read only. */
-	if (storage->readonly) {
-		storage->str = g_string_new(NULL);
-	} else {
-		storage->str = NULL;
-	}
+    /* Use gstring as storage in case when the file is used read only. */
+    if (storage->readonly) {
+        storage->str = g_string_new(NULL);
+    } else {
+        storage->str = NULL;
+    }
 
-	return storage;
+    return storage;
 }
 
 /**
@@ -47,13 +47,13 @@ FileStorage *file_storage_new(const char *dir, const char *filename, gboolean re
  */
 void file_storage_free(FileStorage *storage)
 {
-	if (storage) {
-		g_free(storage->file_path);
-		if (storage->str) {
-			g_string_free(storage->str, TRUE);
-		}
-		g_slice_free(FileStorage, storage);
-	}
+    if (storage) {
+        g_free(storage->file_path);
+        if (storage->str) {
+            g_string_free(storage->str, TRUE);
+        }
+        g_slice_free(FileStorage, storage);
+    }
 }
 
 /**
@@ -64,29 +64,29 @@ void file_storage_free(FileStorage *storage)
  */
 gboolean file_storage_append(FileStorage *storage, const char *format, ...)
 {
-	FILE *f;
-	va_list args;
+    FILE *f;
+    va_list args;
 
-	g_assert(storage);
+    g_assert(storage);
 
-	/* Write data to in memory list in case the file storage is read only. */
-	if (storage->readonly) {
-		va_start(args, format);
-		g_string_append_vprintf(storage->str, format, args);
-		va_end(args);
-		return TRUE;
-	}
-	if ((f = fopen(storage->file_path, "a+"))) {
-		flock(fileno(f), LOCK_EX);
-		va_start(args, format);
-		vfprintf(f, format, args);
-		va_end(args);
-		flock(fileno(f), LOCK_UN);
-		fclose(f);
-		return TRUE;
-	}
+    /* Write data to in memory list in case the file storage is read only. */
+    if (storage->readonly) {
+        va_start(args, format);
+        g_string_append_vprintf(storage->str, format, args);
+        va_end(args);
+        return TRUE;
+    }
+    if ((f = fopen(storage->file_path, "a+"))) {
+        flock(fileno(f), LOCK_EX);
+        va_start(args, format);
+        vfprintf(f, format, args);
+        va_end(args);
+        flock(fileno(f), LOCK_UN);
+        fclose(f);
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 /**
@@ -96,37 +96,37 @@ gboolean file_storage_append(FileStorage *storage, const char *format, ...)
  */
 char **file_storage_get_lines(FileStorage *storage)
 {
-	char *fullcontent = NULL;
-	char *content     = NULL;
-	char **lines      = NULL;
+    char *fullcontent = NULL;
+    char *content     = NULL;
+    char **lines      = NULL;
 
-	g_file_get_contents(storage->file_path, &content, NULL, NULL);
+    g_file_get_contents(storage->file_path, &content, NULL, NULL);
 
-	if (storage->str && storage->str->len) {
-		if (content) {
-			fullcontent = g_strconcat(content, storage->str->str, NULL);
-			lines       = g_strsplit(fullcontent, "\n", -1);
-			g_free(fullcontent);
-		} else {
-			lines = g_strsplit(storage->str->str, "\n", -1);
-		}
-	} else {
-		lines = g_strsplit(content ? content : "", "\n", -1);
-	}
+    if (storage->str && storage->str->len) {
+        if (content) {
+            fullcontent = g_strconcat(content, storage->str->str, NULL);
+            lines       = g_strsplit(fullcontent, "\n", -1);
+            g_free(fullcontent);
+        } else {
+            lines = g_strsplit(storage->str->str, "\n", -1);
+        }
+    } else {
+        lines = g_strsplit(content ? content : "", "\n", -1);
+    }
 
-	if (content) {
-		g_free(content);
-	}
+    if (content) {
+        g_free(content);
+    }
 
-	return lines;
+    return lines;
 }
 
 const char *file_storage_get_path(FileStorage *storage)
 {
-	return storage->file_path;
+    return storage->file_path;
 }
 
 gboolean file_storage_is_readonly(FileStorage *storage)
 {
-	return storage->readonly;
+    return storage->readonly;
 }
