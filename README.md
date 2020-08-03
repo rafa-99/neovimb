@@ -6,6 +6,11 @@ Neovimb is a fork from vimb web browser that is inspired by Pentadactyl and Vimp
 
 - gtk+-3.0
 - webkit2gtk-4.0 >= 2.20.x
+### Optional
+
+- grc
+- gst-libav
+- gst-plugins-good
 
 ## Install
 
@@ -13,7 +18,7 @@ Edit `config.mk` to match your local setup. You might need to do this if
 you use another compiler, like tcc. Most people, however, will almost never
 need to do this on systems like Ubuntu or Debian.
 
-Edit `src/config.h` to match your personal preferences, like changing the
+Edit `include/config.h` to match your personal preferences, like changing the
 characters used in the loading bar, or the font.
 
 The default `Makefile` will not overwrite your customised `config.h` with the

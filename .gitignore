@@ -3,3 +3,4 @@
 *.so
 *.tar.gz
 include/version.h
+include/config.h
