@@ -1,36 +1,17 @@
-/**
- * vimb - a webkit based vim like browser.
- *
- * Copyright (C) 2012-2018 Daniel Carl
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- */
-
 #include <glib.h>
 #include <string.h>
 
-#include "ascii.h"
-#include "main.h"
-#include "shortcut.h"
-#include "util.h"
+#include "../include/ascii.h"
+#include "../include/main.h"
+#include "../include/shortcut.h"
+#include "../include/util.h"
 
 struct shortcut {
     GHashTable  *table;
     char        *fallback;  /* default shortcut to use if none given in request */
 };
 
-extern struct Vimb vb;
+extern struct Neovimb vb;
 
 static int get_max_placeholder(const char *str);
 static const char *shortcut_lookup(Shortcut *sc, const char *string, const char **query);

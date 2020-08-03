@@ -1,35 +1,16 @@
-/**
- * vimb - a webkit based vim like browser.
- *
- * Copyright (C) 2012-2018 Daniel Carl
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- */
-
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
 
-#include "ascii.h"
-#include "command.h"
-#include "config.h"
-#include "hints.h"
-#include "ext-proxy.h"
-#include "main.h"
-#include "normal.h"
+#include "../include/ascii.h"
+#include "../include/command.h"
+#include "../include/config.h"
+#include "../include/hints.h"
+#include "../include/ext-proxy.h"
+#include "../include/main.h"
+#include "../include/normal.h"
 #include "scripts/scripts.h"
-#include "util.h"
-#include "ext-proxy.h"
+#include "../include/util.h"
+#include "../include/ext-proxy.h"
 
 typedef enum {
     PHASE_START,
@@ -212,10 +193,10 @@ static struct {
 /* DEL 0x7f */ {NULL},
 };
 
-extern struct Vimb vb;
+extern struct Neovimb vb;
 
 /**
- * Function called when vimb enters the normal mode.
+ * Function called when neovimb enters the normal mode.
  */
 void normal_enter(Client *c)
 {
@@ -313,7 +294,7 @@ VbResult normal_keypress(Client *c, int key)
 }
 
 /**
- * Function called when vimb enters the passthrough mode.
+ * Function called when neovimb enters the passthrough mode.
  */
 void pass_enter(Client *c)
 {
@@ -449,7 +430,7 @@ static VbResult normal_focus_last_active(Client *c, const NormalCmdInfo *info)
     GVariant *variant;
     gboolean focused;
 
-    variant = ext_proxy_eval_script_sync(c, "vimb_input_mode_element.focus();");
+    variant = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.focus();");
     g_variant_get(variant, "(bs)", &focused, NULL);
     if (!focused) {
         ext_proxy_focus_input(c);

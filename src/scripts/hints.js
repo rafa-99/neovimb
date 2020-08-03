@@ -7,7 +7,7 @@ var hints = Object.freeze((function(){
         activeHint,        /* holds the active hint object */
         filterText = "",   /* holds the typed text filter */
         filterKeys = "",   /* holds the typed hint-keys filter */
-        attr = "vimbhint",
+        attr = "neovimbhint",
         config;
     /* the hint class used to maintain hinted element and labels */
     function Hint() {
@@ -89,8 +89,8 @@ var hints = Object.freeze((function(){
         }
         for (i = 0; i < docs.length; i++) {
             doc = docs[i];
-            /* find all hinted elements vimbhint 'hint' */
-            var res = xpath(doc.doc, "//*[@vimbhint]");
+            /* find all hinted elements neovimbhint 'hint' */
+            var res = xpath(doc.doc, "//*[@neovimbhint]");
             for (j = 0; j < res.snapshotLength; j++) {
                 e = res.snapshotItem(j);
                 e.removeAttribute(attr);

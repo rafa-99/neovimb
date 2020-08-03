@@ -1,23 +1,4 @@
 /**
- * vimb - a webkit based vim like browser.
- *
- * Copyright (C) 2012-2018 Daniel Carl
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- */
-
-/**
  * This file contains function to handle input editing, parsing of called ex
  * commands from inputbox and the ex commands.
  */
@@ -26,22 +7,22 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#include "ascii.h"
-#include "bookmark.h"
-#include "command.h"
-#include "completion.h"
-#include "config.h"
-#include "ex.h"
-#include "handler.h"
-#include "hints.h"
-#include "main.h"
-#include "map.h"
-#include "setting.h"
-#include "shortcut.h"
-#include "util.h"
-#include "ext-proxy.h"
-#include "autocmd.h"
-#include "util.h"
+#include "../include/ascii.h"
+#include "../include/bookmark.h"
+#include "../include/command.h"
+#include "../include/completion.h"
+#include "../include/config.h"
+#include "../include/ex.h"
+#include "../include/handler.h"
+#include "../include/hints.h"
+#include "../include/main.h"
+#include "../include/map.h"
+#include "../include/setting.h"
+#include "../include/shortcut.h"
+#include "../include/util.h"
+#include "../include/ext-proxy.h"
+#include "../include/autocmd.h"
+#include "../include/util.h"
 
 typedef enum {
 #ifdef FEATURE_AUTOCMD
@@ -215,10 +196,10 @@ static struct {
     char  *token;   /* initial filter content */
 } excomp;
 
-extern struct Vimb vb;
+extern struct Neovimb vb;
 
 /**
- * Function called when vimb enters the command mode.
+ * Function called when neovimb enters the command mode.
  */
 void ex_enter(Client *c)
 {
@@ -1085,13 +1066,13 @@ static VbCmdResult ex_shellcmd(Client *c, const ExArg *arg)
         return CMD_ERROR;
     }
 
-    /* Get current selection and write it as VIMB_SELECTION into env. */
+    /* Get current selection and write it as NEOVIMB_SELECTION into env. */
     selection = ext_proxy_get_current_selection(c);
     if (selection) {
-        g_setenv("VIMB_SELECTION", selection, TRUE);
+        g_setenv("NEOVIMB_SELECTION", selection, TRUE);
         g_free(selection);
     } else {
-        g_setenv("VIMB_SELECTION", "", TRUE);
+        g_setenv("NEOVIMB_SELECTION", "", TRUE);
     }
 
     if (arg->bang) {

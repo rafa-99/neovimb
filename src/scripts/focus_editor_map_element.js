@@ -1,2 +1,2 @@
-vimb_editor_map.get("%lu").disabled=false;
-vimb_editor_map.get("%lu").focus();
+neovimb_editor_map.get("%lu").disabled=false;
+neovimb_editor_map.get("%lu").focus();

@@ -1,36 +1,17 @@
-/**
- * vimb - a webkit based vim like browser.
- *
- * Copyright (C) 2012-2018 Daniel Carl
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- */
-
-#include "config.h"
+#include "../include/config.h"
 #include <string.h>
 #include <webkit2/webkit2.h>
 #include <JavaScriptCore/JavaScript.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkkeysyms-compat.h>
-#include "hints.h"
-#include "main.h"
-#include "ascii.h"
-#include "command.h"
-#include "input.h"
-#include "map.h"
-#include "normal.h"
-#include "ext-proxy.h"
+#include "../include/hints.h"
+#include "../include/main.h"
+#include "../include/ascii.h"
+#include "../include/command.h"
+#include "../include/input.h"
+#include "../include/map.h"
+#include "../include/normal.h"
+#include "../include/ext-proxy.h"
 
 static struct {
     char           mode;      /* mode identifying char - that last char of the hint prompt */
@@ -43,7 +24,7 @@ static struct {
     guint          timeout_id;
 } hints;
 
-extern struct Vimb vb;
+extern struct Neovimb vb;
 
 static gboolean call_hints_function(Client *c, const char *func, const char* args,
         gboolean sync);
@@ -334,7 +315,7 @@ static gboolean hint_function_check_result(Client *c, GVariant *return_value)
         /* Change to normal mode only if we are currently in command mode and
          * we are not in g-mode hinting. This is required to not switch to
          * normal mode when the hinting triggered a click that set focus on
-         * editable element that lead vimb to switch to input mode. */
+         * editable element that lead neovimb to switch to input mode. */
         if (!hints.gmode && c->mode->id == 'c') {
             vb_enter(c, 'n');
         }
