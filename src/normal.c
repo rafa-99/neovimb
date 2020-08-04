@@ -148,7 +148,7 @@ static struct {
 	/* R   0x52 */ {normal_navigate},
 	/* S   0x53 */ {NULL},
 	/* T   0x54 */ {normal_input_open},
-	/* U   0x55 */ {normal_open},
+	/* U   0x55 */ {NULL},
 	/* V   0x56 */ {NULL},
 	/* W   0x57 */ {NULL},
 	/* X   0x58 */ {NULL},
@@ -180,7 +180,7 @@ static struct {
 	/* r   0x72 */ {normal_navigate},
 	/* s   0x73 */ {NULL},
 	/* t   0x74 */ {normal_input_open},
-	/* u   0x75 */ {normal_open},
+	/* u   0x75 */ {NULL},
 	/* v   0x76 */ {NULL},
 	/* w   0x77 */ {NULL},
 	/* x   0x78 */ {NULL},
@@ -627,21 +627,6 @@ static VbResult normal_open_clipboard(Client *c, const NormalCmdInfo *info)
 	}
 
 	return RESULT_ERROR;
-}
-
-/**
- * Open the last closed page.
- */
-static VbResult normal_open(Client *c, const NormalCmdInfo *info)
-{
-	Arg a;
-
-	a.i = info->key == 'U' ? TARGET_NEW : TARGET_CURRENT;
-
-	vb_load_uri(c, &a);
-	g_free(a.s);
-
-	return RESULT_COMPLETE;
 }
 
 static VbResult normal_pass(Client *c, const NormalCmdInfo *info)
