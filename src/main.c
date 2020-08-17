@@ -1797,31 +1797,33 @@ static void neovimb_setup(void)
 {
 	WebKitWebContext *ctx;
 	WebKitCookieManager *cm;
-	char *path;
+	char *configPath, *dataPath;
 
 	/* prepare the file pathes */
-	path = util_get_config_dir();
+	configPath = util_get_config_dir();
+	dataPath = util_get_data_dir();
 
 	if (vb.configfile) {
 		char *rp = realpath(vb.configfile, NULL);
 		vb.files[FILES_CONFIG] = g_strdup(rp);
 		free(rp);
 	} else {
-		vb.files[FILES_CONFIG] = g_build_filename(path, "config", NULL);
+		vb.files[FILES_CONFIG] = g_build_filename(configPath, "config", NULL);
 	}
 
 	/* Setup those files that are use multiple time during runtime */
 	if (!vb.incognito) {
-		vb.files[FILES_COOKIE] = g_build_filename(path, "cookies.db", NULL);
+		vb.files[FILES_COOKIE] = g_build_filename(dataPath, "cookies.db", NULL);
 	}
-	vb.files[FILES_BOOKMARK]   = g_build_filename(path, "bookmark", NULL);
-	vb.files[FILES_QUEUE]      = g_build_filename(path, "queue", NULL);
-	vb.files[FILES_SCRIPT]     = g_build_filename(path, "scripts.js", NULL);
-	vb.files[FILES_USER_STYLE] = g_build_filename(path, "style.css", NULL);
+	vb.files[FILES_BOOKMARK]   = g_build_filename(configPath, "bookmark", NULL);
+	vb.files[FILES_QUEUE]      = g_build_filename(configPath, "queue", NULL);
+	vb.files[FILES_SCRIPT]     = g_build_filename(configPath, "scripts.js", NULL);
+	vb.files[FILES_USER_STYLE] = g_build_filename(configPath, "style.css", NULL);
 
-	vb.storage[STORAGE_COMMAND]  = file_storage_new(path, "command", vb.incognito);
-	vb.storage[STORAGE_SEARCH]   = file_storage_new(path, "search", vb.incognito);
-	g_free(path);
+	vb.storage[STORAGE_COMMAND]  = file_storage_new(configPath, "command", vb.incognito);
+	vb.storage[STORAGE_SEARCH]   = file_storage_new(configPath, "search", vb.incognito);
+	g_free(configPath);
+	g_free(dataPath);
 
 	/* Use seperate rendering processed for the webview of the clients in the
 	 * current instance. This must be called as soon as possible according to

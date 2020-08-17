@@ -316,6 +316,16 @@ char *util_file_pop_line(const char *file, int *item_count)
 char *util_get_config_dir(void)
 {
 	char *path = g_build_filename(g_get_user_config_dir(), PROJECT, vb.profile, NULL);
+	return path;
+}
+
+/**
+ * Retrieves the data directory path according to current used profile.
+ * Returned string must be freed.
+ */
+char *util_get_data_dir(void)
+{
+	char *path = g_build_filename(g_get_user_data_dir(), PROJECT, vb.profile, NULL);
 	create_dir_if_not_exists(path);
 
 	return path;
