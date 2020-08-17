@@ -18,10 +18,10 @@ function vbscroll(mode, scrollStep, count) {
         case 'l':
             x = c * scrollStep;
             break;
-        case '\x04': /* ^D */
+        case 'd':
             y = c * ph / 2;
             break;
-        case '\x15': /* ^U */
+        case 'u':
             y = -c * ph / 2;
             break;
         case '\x06': /* ^F */
