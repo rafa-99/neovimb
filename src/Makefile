@@ -35,8 +35,10 @@ scripts/scripts.h: $(JSFILES) $(CSSFILES)
 	done
 
 config.h:
-	@echo create $@ from config.def.h
-	$(Q)cp ../include/config.def.h ../include/$@
+	@if [ ! -f ../include/config.h ]; then\
+		echo create $@ from config.def.h;\
+		$(Q)cp ../include/config.def.h ../include/$@;\
+		fi
 
 %.o: %.c
 	@echo "${CC} $@"
