@@ -44,3 +44,10 @@
 
 /* default download folder */
 #define DLPATH "~/Downloads"
+
+/* cookies policy
+ * -> always
+ * -> origin
+ * -> never
+ */
+#define COOKIES "always"

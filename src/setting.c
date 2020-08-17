@@ -117,7 +117,7 @@ void setting_init(Client *c)
 	/* internal variables */
 	setting_add(c, "stylesheet", TYPE_BOOLEAN, &on, user_style, 0, NULL);
 	setting_add(c, "user-scripts", TYPE_BOOLEAN, &on, user_scripts, 0, NULL);
-	setting_add(c, "cookie-accept", TYPE_CHAR, &"always", cookie_accept, 0, NULL);
+	setting_add(c, "cookie-accept", TYPE_CHAR, &COOKIES, cookie_accept, 0, NULL);
 	i = 40;
 	setting_add(c, "scroll-step", TYPE_INTEGER, &i, internal, 0, &c->config.scrollstep);
 	i = 1;
