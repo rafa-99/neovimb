@@ -22,3 +22,6 @@ span[neovimbhint^='label']{
 span[neovimbhint='label focus']{
     opacity:1;
 }
+body::-webkit-scrollbar {
+	display: none;
+}
