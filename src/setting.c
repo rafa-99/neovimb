@@ -135,7 +135,7 @@ void setting_init(Client *c)
 	setting_add(c, "show-titlebar", TYPE_BOOLEAN, &on, window_decorate, 0, NULL);
 	i = 100;
 	setting_add(c, "default-zoom", TYPE_INTEGER, &i, default_zoom, 0, NULL);
-	setting_add(c, "download-path", TYPE_CHAR, &"~/", NULL, 0, NULL);
+	setting_add(c, "download-path", TYPE_CHAR, &DLPATH, NULL, 0, NULL);
 	setting_add(c, "download-command", TYPE_CHAR, &"/bin/sh -c \"curl -sLJOC - -e '$NEOVIMB_URI' %s\"", NULL, 0, NULL);
 	setting_add(c, "download-use-external", TYPE_BOOLEAN, &off, NULL, 0, NULL);
 	setting_add(c, "incsearch", TYPE_BOOLEAN, &off, internal, 0, &c->config.incsearch);

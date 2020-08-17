@@ -41,3 +41,6 @@
 
 /* if set to 1 neovimb will check if the webextension could be found. */
 #define CHECK_WEBEXTENSION_ON_STARTUP 1
+
+/* default download folder */
+#define DLPATH "~/Downloads"
