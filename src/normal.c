@@ -46,7 +46,6 @@ static VbResult normal_input_open(Client *c, const NormalCmdInfo *info);
 static VbResult normal_mark(Client *c, const NormalCmdInfo *info);
 static VbResult normal_navigate(Client *c, const NormalCmdInfo *info);
 static VbResult normal_open_clipboard(Client *c, const NormalCmdInfo *info);
-static VbResult normal_open(Client *c, const NormalCmdInfo *info);
 static VbResult normal_pass(Client *c, const NormalCmdInfo *info);
 static VbResult normal_prevnext(Client *c, const NormalCmdInfo *info);
 static VbResult normal_queue(Client *c, const NormalCmdInfo *info);
