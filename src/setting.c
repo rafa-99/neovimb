@@ -130,7 +130,7 @@ void setting_init(Client *c)
 	setting_add(c, "status-bar", TYPE_BOOLEAN, &on, statusbar, 0, NULL);
 	i = 1000;
 	setting_add(c, "timeoutlen", TYPE_INTEGER, &i, internal, 0, &c->map.timeoutlen);
-	setting_add(c, "input-autohide", TYPE_BOOLEAN, &off, input_autohide, 0, &c->config.input_autohide);
+	setting_add(c, "input-autohide", TYPE_BOOLEAN, &on, input_autohide, 0, &c->config.input_autohide);
 	setting_add(c, "fullscreen", TYPE_BOOLEAN, &off, fullscreen, 0, NULL);
 	setting_add(c, "show-titlebar", TYPE_BOOLEAN, &on, window_decorate, 0, NULL);
 	i = 100;
