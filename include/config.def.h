@@ -51,3 +51,6 @@
  * -> never
  */
 #define COOKIES "always"
+
+/* Default User Agent */
+#define USERAGENT "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
