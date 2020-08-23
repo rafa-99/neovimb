@@ -37,7 +37,7 @@ scripts/scripts.h: $(JSFILES) $(CSSFILES)
 config.h:
 	@if [ ! -f ../include/config.h ]; then\
 		echo create $@ from config.def.h;\
-		$(Q)cp ../include/config.def.h ../include/$@;\
+		cp ../include/config.def.h ../include/$@;\
 		fi
 
 %.o: %.c
