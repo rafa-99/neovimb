@@ -52,5 +52,10 @@
  */
 #define COOKIES "always"
 
-/* Default User Agent */
+/* default user agent */
 #define USERAGENT "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+
+/* default bar settings */
+
+// background color -/- font color
+#define BARCOLOR "background-color:#95e454;color:#000;"
