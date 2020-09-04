@@ -58,4 +58,5 @@
 /* default bar settings */
 
 // background color -/- font color
-#define BARCOLOR "background-color:#95e454;color:#000;"
+#define BARCOLOR "background-color:#282828;color:#888888;"
+#define INPUTBARCOLOR "background-color:#141414;color:#888888;font:"

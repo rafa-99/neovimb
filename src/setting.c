@@ -149,16 +149,15 @@ void setting_init(Client *c)
 	setting_add(c, "completion-css", TYPE_CHAR, &"color:#fff;background-color:#656565;font:" SETTING_GUI_FONT_NORMAL, gui_style, 0, NULL);
 	setting_add(c, "completion-hover-css", TYPE_CHAR, &"background-color:#777;", gui_style, 0, NULL);
 	setting_add(c, "completion-selected-css", TYPE_CHAR, &"color:#f6f3e8;background-color:#888;", gui_style, 0, NULL);
-	setting_add(c, "input-css", TYPE_CHAR, &"background-color:#fff;color:#000;font:" SETTING_GUI_FONT_NORMAL, gui_style, 0, NULL);
-	setting_add(c, "input-error-css", TYPE_CHAR, &"background-color:#f77;font:" SETTING_GUI_FONT_EMPH, gui_style, 0, NULL);
-	setting_add(c, "status-css", TYPE_CHAR, &"color:#fff;background-color:#000;font:" SETTING_GUI_FONT_EMPH, gui_style, 0, NULL);
+	setting_add(c, "input-css", TYPE_CHAR, &INPUTBARCOLOR SETTING_GUI_FONT_NORMAL, gui_style, 0, NULL);
+	setting_add(c, "input-error-css", TYPE_CHAR, &INPUTBARCOLOR SETTING_GUI_FONT_EMPH, gui_style, 0, NULL);
+	setting_add(c, "status-css", TYPE_CHAR, &BARCOLOR SETTING_GUI_FONT_EMPH, gui_style, 0, NULL);
 	setting_add(c, "status-ssl-css", TYPE_CHAR, &BARCOLOR, gui_style, 0, NULL);
 	setting_add(c, "status-ssl-invalid-css", TYPE_CHAR, &"background-color:#f77;color:#000;", gui_style, 0, NULL);
 
 	/* initialize the shortcuts and set the default shortcuts */
-	shortcut_add(c->config.shortcuts, "dl", "https://duckduckgo.com/html/?q=$0");
 	shortcut_add(c->config.shortcuts, "dd", "https://duckduckgo.com/?q=$0");
-	shortcut_set_default(c->config.shortcuts, "dl");
+	shortcut_set_default(c->config.shortcuts, "dd");
 }
 
 VbCmdResult setting_run(Client *c, char *name, const char *param)
