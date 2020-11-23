@@ -52,11 +52,20 @@
  */
 #define COOKIES "always"
 
+/* JavaScript */
+#define JS on
+
+/* Geolocation
+ * -> always
+ * -> ask
+ * -> never
+ */
+#define GEOLOCATION "ask"
+
 /* default user agent */
 #define USERAGENT "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
 
 /* default bar settings */
-
 // background color -/- font color
 #define BARCOLOR "background-color:#282828;color:#888888;"
 #define INPUTBARCOLOR "background-color:#141414;color:#888888;font:"

@@ -74,7 +74,7 @@ void setting_init(Client *c)
 	i = SETTING_DEFAULT_FONT_SIZE;
 	setting_add(c, "font-size", TYPE_INTEGER, &i, webkit, 0, "default-font-size");
 	setting_add(c, "frame-flattening", TYPE_BOOLEAN, &off, webkit, 0, "enable-frame-flattening");
-	setting_add(c, "geolocation", TYPE_CHAR, &"ask", geolocation, FLAG_NODUP, NULL);
+	setting_add(c, "geolocation", TYPE_CHAR, &GEOLOCATION, geolocation, FLAG_NODUP, NULL);
 	setting_add(c, "hardware-acceleration-policy", TYPE_CHAR, &"ondemand", hardware_acceleration_policy, FLAG_NODUP, NULL);
 	setting_add(c, "header", TYPE_CHAR, &"", headers, FLAG_LIST|FLAG_NODUP, "header");
 	i = 1000;
@@ -103,7 +103,7 @@ void setting_init(Client *c)
 	setting_add(c, "prevent-newwindow", TYPE_BOOLEAN, &off, internal, 0, &c->config.prevent_newwindow);
 	setting_add(c, "print-backgrounds", TYPE_BOOLEAN, &on, webkit, 0, "print-backgrounds");
 	setting_add(c, "sans-serif-font", TYPE_CHAR, &"sans-serif", webkit, 0, "sans-serif-font-family");
-	setting_add(c, "scripts", TYPE_BOOLEAN, &on, webkit, 0, "enable-javascript");
+	setting_add(c, "scripts", TYPE_BOOLEAN, &JS, webkit, 0, "enable-javascript");
 	setting_add(c, "serif-font", TYPE_CHAR, &"serif", webkit, 0, "serif-font-family");
 	setting_add(c, "site-specific-quirks", TYPE_BOOLEAN, &off, webkit, 0, "enable-site-specific-quirks");
 	setting_add(c, "smooth-scrolling", TYPE_BOOLEAN, &off, webkit, 0, "enable-smooth-scrolling");
