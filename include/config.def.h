@@ -33,6 +33,7 @@
 #define SETTING_GUI_FONT_NORMAL               "10pt monospace"
 #define SETTING_GUI_FONT_EMPH                 "bold 10pt monospace"
 #define SETTING_HOME_PAGE                     "about:blank"
+#define SEARCH_ENGINE                         "https://duckduckgo.com/?q=$0"
 
 #define MAXIMUM_HINTS              500
 /* default window dimensions */

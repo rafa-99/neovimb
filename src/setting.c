@@ -156,8 +156,8 @@ void setting_init(Client *c)
 	setting_add(c, "status-ssl-invalid-css", TYPE_CHAR, &"background-color:#f77;color:#000;", gui_style, 0, NULL);
 
 	/* initialize the shortcuts and set the default shortcuts */
-	shortcut_add(c->config.shortcuts, "dd", "https://duckduckgo.com/?q=$0");
-	shortcut_set_default(c->config.shortcuts, "dd");
+	shortcut_add(c->config.shortcuts, "se", SEARCH_ENGINE);
+	shortcut_set_default(c->config.shortcuts, "se");
 }
 
 VbCmdResult setting_run(Client *c, char *name, const char *param)
