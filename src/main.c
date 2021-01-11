@@ -1787,6 +1787,7 @@ static void neovimb_cleanup(void)
 	g_free(vb.profile);
 
 	g_slist_free_full(vb.cmdargs, g_free);
+	g_clear_object(&vb.webcontext);
 }
 #endif
 
@@ -1795,8 +1796,6 @@ static void neovimb_cleanup(void)
  */
 static void neovimb_setup(void)
 {
-	WebKitWebContext *ctx;
-	WebKitCookieManager *cm;
 	char *configPath, *dataPath;
 
 	/* prepare the file pathes */
@@ -1825,22 +1824,32 @@ static void neovimb_setup(void)
 	g_free(configPath);
 	g_free(dataPath);
 
+	WebKitWebsiteDataManager *manager = NULL;
+	if (vb.incognito) {
+		manager = webkit_website_data_manager_new_ephemeral();
+	} else {
+	manager = webkit_website_data_manager_new(
+		"base-data-directory", util_get_data_dir(),
+		"base-cache-directory", util_get_cache_dir(),
+		NULL);
+	}
+
+	vb.webcontext = webkit_web_context_new_with_website_data_manager(manager);
+	manager       = webkit_web_context_get_website_data_manager(vb.webcontext);
 	/* Use seperate rendering processed for the webview of the clients in the
 	 * current instance. This must be called as soon as possible according to
 	 * the documentation. */
-	if (vb.incognito) {
-		ctx = webkit_web_context_new_ephemeral();
-	} else {
-		ctx = webkit_web_context_get_default();
-	}
-	webkit_web_context_set_process_model(ctx, WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES);
-	webkit_web_context_set_cache_model(ctx, WEBKIT_CACHE_MODEL_WEB_BROWSER);
+	webkit_web_context_set_process_model(vb.webcontext, WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES);
+	webkit_web_context_set_cache_model(vb.webcontext, WEBKIT_CACHE_MODEL_WEB_BROWSER);
 
-	g_signal_connect(ctx, "initialize-web-extensions", G_CALLBACK(on_webctx_init_web_extension), NULL);
+	g_signal_connect(vb.webcontext, "initialize-web-extensions", G_CALLBACK(on_webctx_init_web_extension), NULL);
 
-	/* Add cookie support only if the cookie file exists. */
-	if (vb.files[FILES_COOKIE]) {
-		cm = webkit_web_context_get_cookie_manager(ctx);
+
+	/* Add cookie support only if the cookie file exists and web context is
+	 * not ephemeral */
+	if (vb.files[FILES_COOKIE] && !webkit_web_context_is_ephemeral(vb.webcontext)) {
+		WebKitCookieManager *cm;
+		cm = webkit_web_context_get_cookie_manager(vb.webcontext);
 		webkit_cookie_manager_set_persistent_storage(
 				cm,
 				vb.files[FILES_COOKIE],
@@ -1965,9 +1974,15 @@ static WebKitWebView *webview_new(Client *c, WebKitWebView *webview)
 	/* create a new webview */
 	ucm = webkit_user_content_manager_new();
 	if (webview) {
-		new = WEBKIT_WEB_VIEW(webkit_web_view_new_with_related_view(webview));
+	new = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
+		"user-content-manager", ucm,
+		"related-view", webview,
+		NULL));
 	} else {
-		new = WEBKIT_WEB_VIEW(webkit_web_view_new_with_user_content_manager(ucm));
+	new = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
+			"user-content-manager", ucm,
+			"web-context", vb.webcontext,
+			NULL));
 	}
 
 	g_object_connect(
