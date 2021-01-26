@@ -742,9 +742,6 @@ static Client *client_new(WebKitWebView *webview)
 static void client_show(WebKitWebView *webview, Client *c)
 {
 	GtkWidget *box;
-#ifndef FEATURE_NO_XEMBED
-	char *xid;
-#endif
 
 	c->window = create_window(c);
 
@@ -794,17 +791,23 @@ static void client_show(WebKitWebView *webview, Client *c)
 	setting_init(c);
 
 	gtk_widget_show_all(c->window);
+
+	char *wid;
+	wid = g_strdup_printf("%d", (int)GDK_WINDOW_XID(gtk_widget_get_window(c->window)));
+	g_setenv("NEOVIMB_WIN_ID", wid, TRUE);
 #ifndef FEATURE_NO_XEMBED
+	/* set the x window id to env */
 	if (vb.embed) {
+		char *xid;
 		xid = g_strdup_printf("%d", (int)vb.embed);
+		g_setenv("NEOVIMB_XID", xid, TRUE);
+		g_free(xid);
 	} else {
-		xid = g_strdup_printf("%d", (int)GDK_WINDOW_XID(gtk_widget_get_window(c->window)));
+		g_setenv("NEOVIMB_XID", wid, TRUE);
 	}
 
-	/* set the x window id to env */
-	g_setenv("NEOVIMB_XID", xid, TRUE);
-	g_free(xid);
 #endif
+	g_free(wid);
 
 	/* start client in normal mode */
 	vb_enter(c, 'n');
