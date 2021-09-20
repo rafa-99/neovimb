@@ -640,18 +640,6 @@ void vb_statusbar_update(Client *c)
 		c->state.scroll_percent = * (guint16*) ( &c->state.scroll_percent );
 #endif
 
-    if ( c->config.statusbar_show_settings ) {
-        /* show js, cookies, and local storage status */
-
-        Setting *js = g_hash_table_lookup(c->config.settings, "scripts");
-        Setting *cookies = g_hash_table_lookup(c->config.settings, "cookie-accept");
-        Setting *local_storage = g_hash_table_lookup(c->config.settings, "html5-local-storage");
-
-        g_string_append_printf(status, " js: %s |", js->value.b ? "on" : "off");
-        g_string_append_printf(status, " cookies: %s |", cookies->value.s);
-        g_string_append_printf(status, " storage: %s", local_storage->value.b ? "on" : "off");
-    }
-
     /* show the scroll status */
     if (c->state.scroll_max == 0) {
         g_string_append(status, " All");
@@ -660,7 +648,7 @@ void vb_statusbar_update(Client *c)
     } else if (c->state.scroll_percent == 100) {
         g_string_append(status, " Bot");
     } else {
-        g_string_append_printf(status, " %hu%%", c->state.scroll_percent);
+        g_string_append_printf(status, " %d%%", c->state.scroll_percent);
     }
 
     gtk_label_set_text(GTK_LABEL(c->statusbar.right), status->str);
