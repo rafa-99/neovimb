@@ -86,24 +86,24 @@ static struct {
 /* ^A  0x01 */ {normal_increment_decrement},
 /* ^B  0x02 */ {normal_scroll},
 /* ^C  0x03 */ {normal_navigate},
-/* ^D  0x04 */ {normal_scroll},
+/* ^D  0x04 */ {NULL},
 /* ^E  0x05 */ {NULL},
 /* ^F  0x06 */ {normal_scroll},
 /* ^G  0x07 */ {NULL},
 /* ^H  0x08 */ {NULL},
-/* ^I  0x09 */ {normal_navigate},
+/* ^I  0x09 */ {NULL},
 /* ^J  0x0a */ {NULL},
 /* ^K  0x0b */ {NULL},
 /* ^L  0x0c */ {NULL},
 /* ^M  0x0d */ {normal_fire},
 /* ^N  0x0e */ {NULL},
-/* ^O  0x0f */ {normal_navigate},
+/* ^O  0x0f */ {NULL},
 /* ^P  0x10 */ {normal_queue},
 /* ^Q  0x11 */ {normal_quit},
 /* ^R  0x12 */ {NULL},
 /* ^S  0x13 */ {NULL},
 /* ^T  0x14 */ {NULL},
-/* ^U  0x15 */ {normal_scroll},
+/* ^U  0x15 */ {NULL},
 /* ^V  0x16 */ {NULL},
 /* ^W  0x17 */ {NULL},
 /* ^X  0x18 */ {normal_increment_decrement},
@@ -154,11 +154,11 @@ static struct {
 /* E   0x45 */ {NULL},
 /* F   0x46 */ {normal_ex},
 /* G   0x47 */ {normal_scroll},
-/* H   0x48 */ {NULL},
+/* H   0x48 */ {normal_navigate},
 /* I   0x49 */ {NULL},
 /* J   0x4a */ {NULL},
 /* K   0x4b */ {NULL},
-/* L   0x4c */ {NULL},
+/* L   0x4c */ {normal_navigate},
 /* M   0x4d */ {NULL},
 /* N   0x4e */ {normal_search},
 /* O   0x4f */ {normal_input_open},
@@ -182,7 +182,7 @@ static struct {
 /* a   0x61 */ {NULL},
 /* b   0x62 */ {NULL},
 /* c   0x63 */ {NULL},
-/* d   0x64 */ {NULL},
+/* d   0x64 */ {normal_scroll},
 /* e   0x65 */ {NULL},
 /* f   0x66 */ {normal_ex},
 /* g   0x67 */ {normal_g_cmd},
@@ -199,7 +199,7 @@ static struct {
 /* r   0x72 */ {normal_navigate},
 /* s   0x73 */ {NULL},
 /* t   0x74 */ {normal_input_open},
-/* u   0x75 */ {normal_open},
+/* u   0x75 */ {normal_scroll},
 /* v   0x76 */ {NULL},
 /* w   0x77 */ {NULL},
 /* x   0x78 */ {NULL},
@@ -589,10 +589,10 @@ static VbResult normal_navigate(Client *c, const NormalCmdInfo *info)
 
     WebKitWebView *view = c->webview;
     switch (info->key) {
-        case CTRL('I'): /* fall through */
-        case CTRL('O'):
+        case 'L': /* fall through */
+        case 'H':
             count = info->count ? info->count : 1;
-            if (info->key == CTRL('O')) {
+            if (info->key == 'H') {
                 if (webkit_web_view_can_go_back(view)) {
                     list = webkit_web_view_get_back_forward_list(view);
                     item = webkit_back_forward_list_get_nth_item(list, -1 * count);
