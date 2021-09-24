@@ -34,7 +34,6 @@
 #include "ex.h"
 #include "handler.h"
 #include "hints.h"
-#include "history.h"
 #include "main.h"
 #include "map.h"
 #include "setting.h"
@@ -122,7 +121,7 @@ static struct {
 } info = {'\0', PHASE_START};
 
 static void input_activate(Client *c);
-static gboolean parse(Client *c, const char **input, ExArg *arg, gboolean *nohist);
+static gboolean parse(Client *c, const char **input, ExArg *arg);
 static gboolean parse_count(const char **input, ExArg *arg);
 static gboolean parse_command_name(Client *c, const char **input, ExArg *arg);
 static gboolean parse_bang(const char **input, ExArg *arg);
@@ -160,8 +159,6 @@ static VbCmdResult ex_handlers(Client *c, const ExArg *arg);
 
 static gboolean complete(Client *c, short direction);
 static void completion_select(Client *c, char *match);
-static gboolean history(Client *c, gboolean prev);
-static void history_rewind(void);
 
 /* The order of following command names is significant. If there exists
  * ambiguous commands matching to the users input, the first defined will be
@@ -217,12 +214,6 @@ static struct {
     char  *current; /* holds the current written input box content */
     char  *token;   /* initial filter content */
 } excomp;
-
-static struct {
-    char  *prefix;  /* prefix that is prepended to the history item to for the complete command */
-    char  *query;   /* part of input text to match the history items */
-    GList *active;
-} exhist;
 
 extern struct Vimb vb;
 
@@ -294,16 +285,6 @@ VbResult ex_keypress(Client *c, int key)
 
             case KEY_SHIFT_TAB:
                 complete(c, -1);
-                break;
-
-            case KEY_UP: /* fall through */
-            case CTRL('P'):
-                history(c, TRUE);
-                break;
-
-            case KEY_DOWN: /* fall through */
-            case CTRL('N'):
-                history(c, FALSE);
                 break;
 
             case KEY_CR:
@@ -484,7 +465,7 @@ VbCmdResult ex_run_file(Client *c, const char *filename)
         if (*line == '#' || !*line) {
             continue;
         }
-        if ((ex_run_string(c, line, FALSE) & ~CMD_KEEPINPUT) == CMD_ERROR) {
+        if ((ex_run_string(c, line) & ~CMD_KEEPINPUT) == CMD_ERROR) {
             res = CMD_ERROR | CMD_KEEPINPUT;
             g_warning("Invalid command in %s: '%s'", filename, line);
         }
@@ -494,25 +475,18 @@ VbCmdResult ex_run_file(Client *c, const char *filename)
     return res;
 }
 
-VbCmdResult ex_run_string(Client *c, const char *input, gboolean enable_history)
+VbCmdResult ex_run_string(Client *c, const char *input)
 {
-    /* copy to have original command for history */
     const char *in  = input;
-    gboolean nohist = FALSE;
     VbCmdResult res = CMD_ERROR | CMD_KEEPINPUT;
     ExArg *arg = g_slice_new0(ExArg);
     arg->lhs   = g_string_new("");
     arg->rhs   = g_string_new("");
 
     while (in && *in) {
-        if (!parse(c, &in, arg, &nohist) || !(res = execute(c, arg))) {
+        if (!parse(c, &in, arg) || !(res = execute(c, arg))) {
             break;
         }
-    }
-
-    if (enable_history && !nohist) {
-        history_add(c, HISTORY_COMMAND, input, NULL);
-        vb_register_add(c, ':', input);
     }
 
     free_cmdarg(arg);
@@ -548,7 +522,7 @@ static void input_activate(Client *c)
 
         case ':':
             vb_enter(c, 'n');
-            res = ex_run_string(c, cmd, TRUE);
+            res = ex_run_string(c, cmd);
             if (!(res & CMD_KEEPINPUT)) {
                 /* clear input on success if this is not explicit ommited */
                 vb_input_set_text(c, "");
@@ -562,7 +536,7 @@ static void input_activate(Client *c)
 /**
  * Parses given input string into given ExArg pointer.
  */
-static gboolean parse(Client *c, const char **input, ExArg *arg, gboolean *nohist)
+static gboolean parse(Client *c, const char **input, ExArg *arg)
 {
     if (!*input || !**input) {
         return FALSE;
@@ -575,9 +549,6 @@ static gboolean parse(Client *c, const char **input, ExArg *arg, gboolean *nohis
     /* remove leading whitespace and : */
     while (**input && (**input == ':' || VB_IS_SPACE(**input))) {
         (*input)++;
-        /* Command started with additional ':' or whitespce - don't record it
-         * in history or registry. */
-        *nohist = TRUE;
     }
     parse_count(input, arg);
 
@@ -1304,8 +1275,6 @@ static gboolean complete(Client *c, short direction)
                     sort = FALSE;
                     if (*token == '!') {
                         found = bookmark_fill_completion(store, token + 1);
-                    } else {
-                        found = history_fill_completion(store, HISTORY_URL, token);
                     }
                     break;
 
@@ -1365,13 +1334,6 @@ static gboolean complete(Client *c, short direction)
             }
         }
         free_cmdarg(arg);
-    } else if (*in == '/' || *in == '?') {
-        if (history_fill_completion(store, HISTORY_SEARCH, in + 1)) {
-            OVERWRITE_STRING(excomp.token, in + 1);
-            OVERWRITE_NSTRING(excomp.prefix, in, 1);
-            found = TRUE;
-            sort  = FALSE;
-        }
     }
 
     /* if the input could be parsed and the tree view could be filled */
@@ -1404,83 +1366,4 @@ static void completion_select(Client *c, char *match)
         excomp.current = g_strconcat(excomp.prefix, match, NULL);
     }
     vb_input_set_text(c, excomp.current);
-}
-
-static gboolean history(Client *c, gboolean prev)
-{
-    char *input;
-    GList *new = NULL;
-
-    input = vb_input_get_text(c);
-    if (exhist.active) {
-        /* calculate the actual content of the inpubox from history data, if
-         * the theoretical content and the actual given input are different
-         * rewind the history to recreate it later new */
-        char *current = g_strconcat(exhist.prefix, (char*)exhist.active->data, NULL);
-        if (strcmp(input, current)) {
-            history_rewind();
-        }
-        g_free(current);
-    }
-
-    /* create the history list if the lookup is started or input was changed */
-    if (!exhist.active) {
-        int type;
-        char prefix[2] = {0};
-        const char *in = (const char*)input;
-
-        skip_whitespace(&in);
-
-        /* save the first char as prefix - this should be : / or ? */
-        prefix[0] = *in;
-
-        /* check which type of history we should use */
-        if (*in == ':') {
-            type = INPUT_COMMAND;
-        } else if (*in == '/' || *in == '?') {
-            /* the history does not distinguish between forward and backward
-             * search, so we don't need the backward search here too */
-            type = INPUT_SEARCH_FORWARD;
-        } else {
-            goto failed;
-        }
-
-        exhist.active = history_get_list(type, in + 1);
-        if (!exhist.active) {
-            goto failed;
-        }
-        OVERWRITE_STRING(exhist.prefix, prefix);
-    }
-
-    if (prev) {
-        if ((new = g_list_next(exhist.active))) {
-            exhist.active = new;
-        }
-    } else if ((new = g_list_previous(exhist.active))) {
-        exhist.active = new;
-    }
-
-    if (!exhist.active) {
-        goto failed;
-    }
-
-    vb_echo_force(c, MSG_NORMAL, FALSE, "%s%s", exhist.prefix, (char*)exhist.active->data);
-
-    g_free(input);
-    return TRUE;
-
-failed:
-    g_free(input);
-    return FALSE;
-}
-
-static void history_rewind(void)
-{
-    if (exhist.active) {
-        /* free temporary used history list */
-        g_list_free_full(exhist.active, (GDestroyNotify)g_free);
-        exhist.active = NULL;
-
-        OVERWRITE_STRING(exhist.prefix, NULL);
-    }
 }

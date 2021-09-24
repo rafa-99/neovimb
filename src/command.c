@@ -29,7 +29,6 @@
 #include "bookmark.h"
 #endif
 #include "command.h"
-#include "history.h"
 #include "util.h"
 #include "main.h"
 
@@ -88,11 +87,10 @@ gboolean command_search(Client *c, const Arg *arg, bool commit)
         direction = c->state.search.direction;
     }
 
-    /* Only committed search strings adjust registers and are recorded in
-     * history, intermediate strings (while using incsearch) don't. */
+    /* Only committed search strings adjust registers
+     * intermediate strings (while using incsearch) don't. */
     if (commit) {
         if (query) {
-            history_add(c, HISTORY_SEARCH, query, NULL);
             vb_register_add(c, '/', query);
         } else {
             /* Committed search without string re-searches last string. */

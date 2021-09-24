@@ -38,7 +38,6 @@
 #include "ex.h"
 #include "ext-proxy.h"
 #include "handler.h"
-#include "history.h"
 #include "input.h"
 #include "js.h"
 #include "main.h"
@@ -688,14 +687,6 @@ static void client_destroy(Client *c)
 {
     Client *p;
     webkit_web_view_stop_loading(c->webview);
-
-    /* Write last URL into file for recreation.
-     * The URL is only stored if the closed-max-items is not 0 and the file
-     * exists. */
-    if (c->state.uri && vb.config.closed_max && vb.files[FILES_CLOSED]) {
-        util_file_prepend_line(vb.files[FILES_CLOSED], c->state.uri,
-                vb.config.closed_max);
-    }
 
     gtk_widget_destroy(c->window);
 
@@ -1538,9 +1529,6 @@ static void on_webview_load_changed(WebKitWebView *webview,
             autocmd_run(c, AU_LOAD_FINISHED, raw_uri, NULL);
 #endif
             c->state.progress = 100;
-            if (uri && strncmp(uri, "about:", 6)) {
-                history_add(c, HISTORY_URL, uri, webkit_web_view_get_title(webview));
-            }
             break;
     }
 
@@ -1768,7 +1756,7 @@ static void update_title(Client *c)
 
 /**
  * Update the contents of the url bar on the left of the statu bar according
- * to current opened url and position in back forward history.
+ * to current opened url and position.
  */
 static void update_urlbar(Client *c)
 {
@@ -1783,7 +1771,6 @@ static void update_urlbar(Client *c)
 
     g_string_append_printf(str, "%s", c->state.uri);
 
-    /* show history indicator only if there is something to show */
     back = webkit_web_view_can_go_back(c->webview);
     fwd  = webkit_web_view_can_go_forward(c->webview);
     if (back || fwd) {
@@ -1848,13 +1835,11 @@ static void vimb_setup(void)
     /* Prepare files in XDG_DATA_HOME */
     dataPath = util_get_data_dir();
     if (!vb.incognito) {
-        vb.files[FILES_CLOSED] = g_build_filename(dataPath, "closed", NULL);
         vb.files[FILES_COOKIE] = g_build_filename(dataPath, "cookies.db", NULL);
     }
     vb.files[FILES_BOOKMARK]   = g_build_filename(dataPath, "bookmark", NULL);
     vb.files[FILES_QUEUE]      = g_build_filename(dataPath, "queue", NULL);
 
-    vb.storage[STORAGE_HISTORY]  = file_storage_new(dataPath, "history", vb.incognito);
     vb.storage[STORAGE_COMMAND]  = file_storage_new(dataPath, "command", vb.incognito);
     vb.storage[STORAGE_SEARCH]   = file_storage_new(dataPath, "search", vb.incognito);
     g_free(dataPath);
@@ -2250,7 +2235,7 @@ int main(int argc, char* argv[])
 
     /* process the --cmd if this was given */
     for (GSList *l = vb.cmdargs; l; l = l->next) {
-        ex_run_string(c, l->data, false);
+        ex_run_string(c, l->data);
     }
     if (argc <= 1) {
         vb_load_uri(c, &(Arg){TARGET_CURRENT, NULL});

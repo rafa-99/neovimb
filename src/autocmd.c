@@ -275,10 +275,6 @@ gboolean autocmd_run(Client *c, AuEvent event, const char *uri, const char *grou
             if (uri && !util_wildmatch(cmd->pattern, uri)) {
                 continue;
             }
-            /* run the command */
-            /* TODO shoult the result be tested for RESULT_COMPLETE? */
-            /* run command and make sure it's not writte to command history */
-            ex_run_string(c, cmd->excmd, false);
         }
     }
 

@@ -66,7 +66,6 @@
 #define REG_CHARS    "\"" USER_REG ":%/;"
 #define REG_SIZE     (sizeof(REG_CHARS) - 1)
 
-#define FILE_CLOSED  "closed"
 #define FILE_COOKIES "cookies"
 
 enum { TARGET_CURRENT, TARGET_RELATED, TARGET_NEW };
@@ -107,7 +106,6 @@ typedef enum {
 
 enum {
     FILES_BOOKMARK,
-    FILES_CLOSED,
     FILES_CONFIG,
     FILES_COOKIE,
     FILES_QUEUE,
@@ -117,10 +115,8 @@ enum {
 };
 
 enum {
-    STORAGE_CLOSED,
     STORAGE_COMMAND,
     STORAGE_CONFIG,
-    STORAGE_HISTORY,
     STORAGE_SEARCH,
     STORAGE_LAST
 };
@@ -283,10 +279,6 @@ struct Vimb {
     FileStorage *storage[STORAGE_LAST];
     char        *profile;           /* profile name */
     GSList      *cmdargs;           /* ex commands given asl --command, -C option */
-    struct {
-        guint   history_max;
-        guint   closed_max;
-    } config;
     GtkCssProvider *style_provider;
     gboolean    no_maximize;
     gboolean    incognito;

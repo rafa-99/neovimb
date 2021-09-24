@@ -149,7 +149,6 @@ void setting_init(Client *c)
     setting_add(c, "home-page", TYPE_CHAR, &SETTING_HOME_PAGE, NULL, 0, NULL);
     i = 2000;
     /* TODO should be global and not overwritten by a new client */
-    setting_add(c, "history-max-items", TYPE_INTEGER, &i, internal, 0, &vb.config.history_max);
     setting_add(c, "editor-command", TYPE_CHAR, &"x-terminal-emulator -e -vi '%s'", NULL, 0, NULL);
     setting_add(c, "strict-ssl", TYPE_BOOLEAN, &on, tls_policy, 0, NULL);
     setting_add(c, "status-bar", TYPE_BOOLEAN, &on, statusbar, 0, NULL);
@@ -166,7 +165,6 @@ void setting_init(Client *c)
     setting_add(c, "incsearch", TYPE_BOOLEAN, &off, internal, 0, &c->config.incsearch);
     i = 10;
     /* TODO should be global and not overwritten by a new client */
-    setting_add(c, "closed-max-items", TYPE_INTEGER, &i, internal, 0, &vb.config.closed_max);
     setting_add(c, "x-hint-command", TYPE_CHAR, &":o <C-R>;", NULL, 0, NULL);
     setting_add(c, "spell-checking", TYPE_BOOLEAN, &off, webkit_spell_checking, 0, NULL);
     setting_add(c, "spell-checking-languages", TYPE_CHAR, &"en_US", webkit_spell_checking_language, FLAG_LIST|FLAG_NODUP, NULL);
