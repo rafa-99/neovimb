@@ -22,3 +22,6 @@ span[vimbhint^='label']{
 span[vimbhint='label focus']{
     opacity:1;
 }
+body::-webkit-scrollbar {
+	display: none;
+}
