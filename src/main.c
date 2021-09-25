@@ -1845,8 +1845,16 @@ static void neovimb_setup(void)
 
     g_free(dataPath);
 
-    // ToDo, Never cookies -- manager = webkit_website_data_manager_new_ephemeral();
-    WebKitWebsiteDataManager *manager =  webkit_website_data_manager_new("base-data-directory", util_get_data_dir(), "base-cache-directory", util_get_cache_dir(), NULL);
+    WebKitWebsiteDataManager *manager = NULL;
+    if ( strcmp(SETTING_COOKIE_ACCEPT, "never") == 0 )
+    {
+	    manager = webkit_website_data_manager_new_ephemeral();
+    }
+    else
+    {
+	    manager =  webkit_website_data_manager_new("base-data-directory", util_get_data_dir(), "base-cache-directory", util_get_cache_dir(), NULL);
+    }
+
     vb.webcontext = webkit_web_context_new_with_website_data_manager(manager);
     manager       = webkit_web_context_get_website_data_manager(vb.webcontext);
     /* Use seperate rendering processed for the webview of the clients in the
