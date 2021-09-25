@@ -30,7 +30,7 @@ typedef struct {
 static gboolean tree_selection_func(GtkTreeSelection *selection,
     GtkTreeModel *model, GtkTreePath *path, gboolean selected, gpointer data);
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 
 /**

@@ -39,7 +39,7 @@ typedef struct {
 static void input_editor_formfiller(const char *text, Client *c, gpointer data);
 
 /**
- * Function called when vimb enters the input mode.
+ * Function called when neovimb enters the input mode.
  */
 void input_enter(Client *c)
 {
@@ -47,7 +47,7 @@ void input_enter(Client *c)
      * disturbing the user */
     gtk_widget_grab_focus(GTK_WIDGET(c->webview));
     vb_modelabel_update(c, "-- INPUT --");
-    ext_proxy_eval_script(c, "var vimb_input_mode_element = document.activeElement;", NULL);
+    ext_proxy_eval_script(c, "var neovimb_input_mode_element = document.activeElement;", NULL);
 }
 
 /**
@@ -55,7 +55,7 @@ void input_enter(Client *c)
  */
 void input_leave(Client *c)
 {
-    ext_proxy_eval_script(c, "vimb_input_mode_element.blur();", NULL);
+    ext_proxy_eval_script(c, "neovimb_input_mode_element.blur();", NULL);
     vb_modelabel_update(c, "");
 }
 
@@ -120,14 +120,14 @@ VbResult input_open_editor(Client *c)
     g_assert(c);
 
     /* get the selected input element */
-    jsreturn = ext_proxy_eval_script_sync(c, "vimb_input_mode_element.value");
+    jsreturn = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.value");
     g_variant_get(jsreturn, "(bs)", &success, &text);
 
     if (!success || !text) {
         return RESULT_ERROR;
     }
 
-    idreturn = ext_proxy_eval_script_sync(c, "vimb_input_mode_element.id");
+    idreturn = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.id");
     g_variant_get(idreturn, "(bs)", &success, &id);
 
     /* Special case: the input element does not have an id assigned to it */
@@ -169,7 +169,7 @@ static void input_editor_formfiller(const char *text, Client *c, gpointer data)
         if (eed->element_id && strlen(eed->element_id) > 0) {
             jscode = g_strdup_printf("document.getElementById(\"%s\").value=\"%s\"", eed->element_id, escaped);
         } else {
-            jscode = g_strdup_printf("vimb_editor_map.get(\"%lu\").value=\"%s\"", eed->element_map_key, escaped);
+            jscode = g_strdup_printf("neovimb_editor_map.get(\"%lu\").value=\"%s\"", eed->element_map_key, escaped);
         }
 
         ext_proxy_eval_script(c, jscode, NULL);

@@ -37,7 +37,7 @@ static struct {
     char    *config_dir;
 } util;
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 static void create_dir_if_not_exists(const char *dirpath);
 static gboolean match(const char *pattern, int patlen, const char *subject);

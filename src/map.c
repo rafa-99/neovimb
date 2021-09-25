@@ -41,7 +41,7 @@ static void process_events(void);
 static void free_events(void);
 static void process_event(GdkEventKey* event);
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 static struct {
     guint state;

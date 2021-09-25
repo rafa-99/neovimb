@@ -267,7 +267,7 @@ struct Client {
     } autocmd;
 };
 
-struct Vimb {
+struct neovimb {
     char        *argv0;
     Client      *clients;
 #ifndef FEATURE_NO_XEMBED

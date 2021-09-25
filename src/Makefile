@@ -4,17 +4,17 @@ OBJ = $(patsubst %.c, %.o, $(wildcard *.c))
 JSFILES  = $(wildcard scripts/*.js)
 CSSFILES = $(wildcard scripts/*.css)
 
-all: vimb webextension.subdir-all
+all: neovimb webextension.subdir-all
 
 clean: webextension.subdir-clean
-	$(RM) vimb vimb.so $(OBJ)
+	$(RM) neovimb neovimb.so $(OBJ)
 	$(RM) scripts/scripts.h
 
-vimb: $(OBJ)
+neovimb: $(OBJ)
 	@echo "${CC} $@"
 	$(Q)$(CC) $(OBJ) $(LDFLAGS) -o $@
 
-vimb.so: $(OBJ)
+neovimb.so: $(OBJ)
 	$(Q)$(CC) -shared $(OBJ) $(LDFLAGS) -o $@
 
 $(OBJ): config.h ../config.mk

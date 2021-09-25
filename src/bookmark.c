@@ -31,7 +31,7 @@ typedef struct {
     char *tags;
 } Bookmark;
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 static GList *load(const char *file);
 static gboolean bookmark_contains_all_tags(Bookmark *bm, char **query,

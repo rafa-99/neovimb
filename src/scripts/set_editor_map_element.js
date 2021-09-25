@@ -1,4 +1,4 @@
-if (typeof(vimb_editor_map) !== 'object') {
-    var vimb_editor_map = new Map;
+if (typeof(neovimb_editor_map) !== 'object') {
+    var neovimb_editor_map = new Map;
 }
-vimb_editor_map.set("%lu", vimb_input_mode_element);
+neovimb_editor_map.set("%lu", neovimb_input_mode_element);

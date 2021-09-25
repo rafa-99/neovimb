@@ -1,4 +1,4 @@
-span[vimbhint^='label']{
+span[neovimbhint^='label']{
     background-color:#fff;
     border:1px solid #444;
     color:#000;
@@ -9,17 +9,17 @@ span[vimbhint^='label']{
     position:fixed !important;
     z-index:225000
 }
-*[vimbhint^='hint']{
+*[neovimbhint^='hint']{
     background-color:#ff0 !important;
     color:#000 !important;
     transition-delay:all 0 !important;
     transition:all 0 !important;
     opacity:1 !important
 }
-*[vimbhint='hint focus']{
+*[neovimbhint='hint focus']{
     background-color:#8f0 !important
 }
-span[vimbhint='label focus']{
+span[neovimbhint='label focus']{
     opacity:1;
 }
 body::-webkit-scrollbar {

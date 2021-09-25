@@ -56,7 +56,7 @@
 /* cookie-accept allowed values always, origin, never */
 #define SETTING_COOKIE_ACCEPT                 "always"
 #define SETTING_HINT_KEYS                     "0123456789"
-#define SETTING_DOWNLOAD_COMMAND              "/bin/sh -c \"curl -sLJOC - -e '$VIMB_URI' %s\""
+#define SETTING_DOWNLOAD_COMMAND              "/bin/sh -c \"curl -sLJOC - -e '$neovimb_URI' %s\""
 #define SETTING_COMPLETION_CSS                "color:#fff;background-color:#656565;font:" SETTING_GUI_FONT_NORMAL
 #define SETTING_COMPLETION_HOVER_CSS          "background-color:#777;"
 #define SETTING_COMPLETION_SELECTED_CSS       "color:#f6f3e8;background-color:#888;"
@@ -71,7 +71,7 @@
 #define WIN_WIDTH                  800
 #define WIN_HEIGHT                 600
 
-/* if set to 1 vimb will check if the webextension could be found. */
+/* if set to 1 neovimb will check if the webextension could be found. */
 #define CHECK_WEBEXTENSION_ON_STARTUP 1
 
 /* Auto Hide Input Bar */

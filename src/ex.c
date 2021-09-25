@@ -215,10 +215,10 @@ static struct {
     char  *token;   /* initial filter content */
 } excomp;
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 /**
- * Function called when vimb enters the command mode.
+ * Function called when neovimb enters the command mode.
  */
 void ex_enter(Client *c)
 {
@@ -1084,13 +1084,13 @@ static VbCmdResult ex_shellcmd(Client *c, const ExArg *arg)
         return CMD_ERROR;
     }
 
-    /* Get current selection and write it as VIMB_SELECTION into env. */
+    /* Get current selection and write it as neovimb_SELECTION into env. */
     selection = ext_proxy_get_current_selection(c);
     if (selection) {
-        g_setenv("VIMB_SELECTION", selection, TRUE);
+        g_setenv("neovimb_SELECTION", selection, TRUE);
         g_free(selection);
     } else {
-        g_setenv("VIMB_SELECTION", "", TRUE);
+        g_setenv("neovimb_SELECTION", "", TRUE);
     }
 
     if (arg->bang) {

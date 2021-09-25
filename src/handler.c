@@ -23,7 +23,7 @@
 #include "handler.h"
 #include "util.h"
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 struct handler {
     GHashTable *table;  /* holds the protocol handlers */

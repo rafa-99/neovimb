@@ -212,10 +212,10 @@ static struct {
 /* DEL 0x7f */ {NULL},
 };
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 /**
- * Function called when vimb enters the normal mode.
+ * Function called when neovimb enters the normal mode.
  */
 void normal_enter(Client *c)
 {
@@ -313,7 +313,7 @@ VbResult normal_keypress(Client *c, int key)
 }
 
 /**
- * Function called when vimb enters the passthrough mode.
+ * Function called when neovimb enters the passthrough mode.
  */
 void pass_enter(Client *c)
 {
@@ -449,7 +449,7 @@ static VbResult normal_focus_last_active(Client *c, const NormalCmdInfo *info)
     GVariant *variant;
     gboolean focused;
 
-    variant = ext_proxy_eval_script_sync(c, "vimb_input_mode_element.focus();");
+    variant = ext_proxy_eval_script_sync(c, "neovimb_input_mode_element.focus();");
     g_variant_get(variant, "(bs)", &focused, NULL);
     if (!focused) {
         ext_proxy_focus_input(c);

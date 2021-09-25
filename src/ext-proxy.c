@@ -46,9 +46,9 @@ static void on_web_extension_page_created(GDBusConnection *connection,
         GVariant *parameters, gpointer data);
 
 /* TODO we need potentially multiple proxies. Because a single instance of
- * vimb may hold multiple clients which may use more than one webprocess and
+ * neovimb may hold multiple clients which may use more than one webprocess and
  * therefore multiple webextension instances. */
-extern struct Vimb vb;
+extern struct neovimb vb;
 static GDBusServer *dbusserver;
 
 

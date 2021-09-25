@@ -30,7 +30,7 @@ struct shortcut {
     char        *fallback;  /* default shortcut to use if none given in request */
 };
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 static int get_max_placeholder(const char *str);
 static const char *shortcut_lookup(Shortcut *sc, const char *string, const char **query);

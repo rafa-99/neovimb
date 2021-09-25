@@ -1,9 +1,9 @@
 # Based on Arch Linux' chromium.desktop
 [Desktop Entry]
-Name=vimb
+Name=neovimb
 GenericName=Web Browser
 Comment=Access the Internet
-Exec=vimb %U
+Exec=neovimb %U
 Terminal=false
 Icon=
 Type=Application

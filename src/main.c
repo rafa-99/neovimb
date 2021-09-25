@@ -108,9 +108,9 @@ static void set_statusbar_style(Client *c, StatusType type);
 static void set_title(Client *c, const char *title);
 static void spawn_new_instance(const char *uri);
 #ifdef FREE_ON_QUIT
-static void vimb_cleanup(void);
+static void neovimb_cleanup(void);
 #endif
-static void vimb_setup(void);
+static void neovimb_setup(void);
 static WebKitWebView *webview_new(Client *c, WebKitWebView *webview);
 static void on_counted_matches(WebKitFindController *finder, guint count, Client *c);
 static gboolean on_permission_request(WebKitWebView *webview,
@@ -123,7 +123,7 @@ static gboolean profileOptionArgFunc(const gchar *option_name,
 static gboolean autocmdOptionArgFunc(const gchar *option_name,
         const gchar *value, gpointer data, GError **error);
 
-struct Vimb vb;
+struct neovimb vb;
 
 /**
  * Set the destination for a download according to suggested file name and
@@ -373,8 +373,8 @@ void vb_input_update_style(Client *c)
  *
  * If arg.i = TARGET_CURRENT, the url is opened into the current webview.
  * TARGET_RELATED causes the generation of a new window within the current
- * instance of vimb with a own, but related webview. And TARGET_NEW spawns a
- * new instance of vimb with the given uri.
+ * instance of neovimb with a own, but related webview. And TARGET_NEW spawns a
+ * new instance of neovimb with the given uri.
  */
 gboolean vb_load_uri(Client *c, const Arg *arg)
 {
@@ -813,16 +813,16 @@ static void client_show(WebKitWebView *webview, Client *c)
 
     char *wid;
     wid = g_strdup_printf("%d", (int)GDK_WINDOW_XID(gtk_widget_get_window(c->window)));
-    g_setenv("VIMB_WIN_ID", wid, TRUE);
+    g_setenv("neovimb_WIN_ID", wid, TRUE);
 #ifndef FEATURE_NO_XEMBED
     /* set the x window id to env */
     if (vb.embed) {
         char *xid;
         xid = g_strdup_printf("%d", (int)vb.embed);
-        g_setenv("VIMB_XID", xid, TRUE);
+        g_setenv("neovimb_XID", xid, TRUE);
         g_free(xid);
     } else {
-        g_setenv("VIMB_XID", wid, TRUE);
+        g_setenv("neovimb_XID", wid, TRUE);
     }
 #endif
     g_free(wid);
@@ -1015,7 +1015,7 @@ static void set_title(Client *c, const char *title)
 {
     OVERWRITE_STRING(c->state.title, title);
     update_title(c);
-    g_setenv("VIMB_TITLE", title ? title : "", TRUE);
+    g_setenv("neovimb_TITLE", title ? title : "", TRUE);
 }
 
 /**
@@ -1170,7 +1170,7 @@ static void spawn_download_command(Client *c, WebKitURIResponse *response)
     }
 
     envp = g_get_environ();
-    envp = g_environ_setenv(envp, "VIMB_DOWNLOAD_PATH",
+    envp = g_environ_setenv(envp, "neovimb_DOWNLOAD_PATH",
             GET_CHAR(c, "download-path"), TRUE);
 
     if (g_spawn_async(NULL, argv, envp, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error)) {
@@ -1328,7 +1328,7 @@ static WebKitWebView *on_webview_create(WebKitWebView *webview,
 /**
  * Callback for the webview decide-policy signal.
  * Checks the reasons for some navigation actions and decides if the action is
- * allowed, or should go into a new instance of vimb.
+ * allowed, or should go into a new instance of neovimb.
  */
 static gboolean on_webview_decide_policy(WebKitWebView *webview,
         WebKitPolicyDecision *dec, WebKitPolicyDecisionType type, Client *c)
@@ -1481,7 +1481,7 @@ static void on_webview_load_changed(WebKitWebView *webview,
                 set_title(c, uri);
             }
             /* Make sure hinting is cleared before the new page is loaded.
-             * Without that vimb would still be in hinting mode after hinting
+             * Without that neovimb would still be in hinting mode after hinting
              * was started and some links was clicked my mouse. Even if there
              * could not hints be shown. */
             if (c->mode->flags & FLAG_HINTING) {
@@ -1603,7 +1603,7 @@ static void on_webview_notify_uri(WebKitWebView *webview, GParamSpec *pspec, Cli
     c->state.uri = util_sanitize_uri(webkit_web_view_get_uri(c->webview));
 
     update_urlbar(c);
-    g_setenv("VIMB_URI", c->state.uri, TRUE);
+    g_setenv("neovimb_URI", c->state.uri, TRUE);
 }
 
 /**
@@ -1785,7 +1785,7 @@ static void update_urlbar(Client *c)
 /**
  * Free memory of the whole application.
  */
-static void vimb_cleanup(void)
+static void neovimb_cleanup(void)
 {
     int i;
 
@@ -1814,7 +1814,7 @@ static void vimb_cleanup(void)
 /**
  * Setup resources used on application scope.
  */
-static void vimb_setup(void)
+static void neovimb_setup(void)
 {
     char *path, *dataPath;
 
@@ -1900,7 +1900,7 @@ void vb_gui_style_update(Client *c, const char *setting_name_new, const char *se
     GString *style_sheet = g_string_new(GUI_STYLE_CSS_BASE);
     size_t i;
 
-    /* Mapping from vimb config setting name to css style sheet string */
+    /* Mapping from neovimb config setting name to css style sheet string */
     static const char *setting_style_map[][2] = {
         {"completion-css",              " #completion{%s}"},
         {"completion-hover-css",        " #completion:hover{%s}"},
@@ -1961,7 +1961,7 @@ void vb_gui_style_update(Client *c, const char *setting_name_new, const char *se
      * invalidated automatically."
      * https://developer.gnome.org/gtk3/stable/GtkStyleContext.html#gtk-style-context-invalidate
      *
-     * Required settings in vimb config file:
+     * Required settings in neovimb config file:
      * set input-autohide=true
      * set input-font-normal=20pt monospace
      *
@@ -2219,10 +2219,10 @@ int main(int argc, char* argv[])
 
     /* set the current pid in env */
     pidstr = g_strdup_printf("%d", (int)getpid());
-    g_setenv("VIMB_PID", pidstr, TRUE);
+    g_setenv("neovimb_PID", pidstr, TRUE);
     g_free(pidstr);
 
-    vimb_setup();
+    neovimb_setup();
 
 #ifndef FEATURE_NO_XEMBED
     if (winid) {
@@ -2248,7 +2248,7 @@ int main(int argc, char* argv[])
 
     gtk_main();
 #ifdef FREE_ON_QUIT
-    vimb_cleanup();
+    neovimb_cleanup();
 #endif
 
     return EXIT_SUCCESS;

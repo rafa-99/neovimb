@@ -70,7 +70,7 @@ static int webkit_spell_checking(Client *c, const char *name, DataType type, voi
 static int webkit_spell_checking_language(Client *c, const char *name, DataType type, void *value, void *data);
 static int window_decorate(Client *c, const char *name, DataType type, void *value, void *data);
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 
 void setting_init(Client *c)
@@ -169,7 +169,7 @@ void setting_init(Client *c)
     setting_add(c, "spell-checking", TYPE_BOOLEAN, &off, webkit_spell_checking, 0, NULL);
     setting_add(c, "spell-checking-languages", TYPE_CHAR, &"en_US", webkit_spell_checking_language, FLAG_LIST|FLAG_NODUP, NULL);
 
-    /* gui style settings vimb */
+    /* gui style settings neovimb */
     setting_add(c, "completion-css", TYPE_CHAR, &SETTING_COMPLETION_CSS, gui_style, 0, NULL);
     setting_add(c, "completion-hover-css", TYPE_CHAR, &SETTING_COMPLETION_HOVER_CSS, gui_style, 0, NULL);
     setting_add(c, "completion-selected-css", TYPE_CHAR, &SETTING_COMPLETION_SELECTED_CSS, gui_style, 0, NULL);

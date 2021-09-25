@@ -43,7 +43,7 @@ static struct {
     guint          timeout_id;
 } hints;
 
-extern struct Vimb vb;
+extern struct neovimb vb;
 
 static gboolean call_hints_function(Client *c, const char *func, const char* args,
         gboolean sync);
@@ -334,7 +334,7 @@ static gboolean hint_function_check_result(Client *c, GVariant *return_value)
         /* Change to normal mode only if we are currently in command mode and
          * we are not in g-mode hinting. This is required to not switch to
          * normal mode when the hinting triggered a click that set focus on
-         * editable element that lead vimb to switch to input mode. */
+         * editable element that lead neovimb to switch to input mode. */
         if (!hints.gmode && c->mode->id == 'c') {
             vb_enter(c, 'n');
         }
