@@ -281,7 +281,6 @@ struct neovimb {
     GSList      *cmdargs;           /* ex commands given asl --command, -C option */
     GtkCssProvider *style_provider;
     gboolean    no_maximize;
-    gboolean    incognito;
 
     WebKitWebContext *webcontext;
 };

@@ -631,6 +631,15 @@ void vb_statusbar_update(Client *c)
 
     statusbar_update_downloads(c, status);
 
+		/**
+		* These architectures have different kinds of issues with scroll
+		* percentage, this is a somewhat clean fix that doesn't affect	others.
+		*/
+#if defined(_ARCH_PPC64) || defined(_ARCH_PPC) | defined(_ARCH_ARM)
+		/* force the scroll percent to be 16-bit */
+		c->state.scroll_percent = * (guint16*) ( &c->state.scroll_percent );
+#endif
+
     /* show the scroll status */
     if (c->state.scroll_max == 0) {
         g_string_append(status, " All");
@@ -1033,7 +1042,6 @@ static void spawn_new_instance(const char *uri)
 #ifndef FEATURE_NO_XEMBED
         + (vb.embed ? 2 : 0)
 #endif
-        + (vb.incognito ? 1 : 0)
         + (vb.profile ? 2 : 0)
         + (vb.no_maximize ? 1 : 0)
         + g_slist_length(vb.cmdargs) * 2,
@@ -1054,9 +1062,6 @@ static void spawn_new_instance(const char *uri)
         cmd[i++] = xid;
     }
 #endif
-    if (vb.incognito) {
-        cmd[i++] = "-i";
-    }
     if (vb.profile) {
         cmd[i++] = "-p";
         cmd[i++] = vb.profile;
@@ -1834,25 +1839,14 @@ static void neovimb_setup(void)
 
     /* Prepare files in XDG_DATA_HOME */
     dataPath = util_get_data_dir();
-    if (!vb.incognito) {
-        vb.files[FILES_COOKIE] = g_build_filename(dataPath, "cookies.db", NULL);
-    }
+    vb.files[FILES_COOKIE] = g_build_filename(dataPath, "cookies.db", NULL);
     vb.files[FILES_BOOKMARK]   = g_build_filename(dataPath, "bookmark", NULL);
     vb.files[FILES_QUEUE]      = g_build_filename(dataPath, "queue", NULL);
 
-    vb.storage[STORAGE_COMMAND]  = file_storage_new(dataPath, "command", vb.incognito);
-    vb.storage[STORAGE_SEARCH]   = file_storage_new(dataPath, "search", vb.incognito);
     g_free(dataPath);
 
-    WebKitWebsiteDataManager *manager = NULL;
-    if (vb.incognito) {
-        manager = webkit_website_data_manager_new_ephemeral();
-    } else {
-        manager = webkit_website_data_manager_new(
-                "base-data-directory", util_get_data_dir(),
-                "base-cache-directory", util_get_cache_dir(),
-                NULL);
-    }
+    // ToDo, Never cookies -- manager = webkit_website_data_manager_new_ephemeral();
+    WebKitWebsiteDataManager *manager =  webkit_website_data_manager_new("base-data-directory", util_get_data_dir(), "base-cache-directory", util_get_cache_dir(), NULL);
     vb.webcontext = webkit_web_context_new_with_website_data_manager(manager);
     manager       = webkit_web_context_get_website_data_manager(vb.webcontext);
     /* Use seperate rendering processed for the webview of the clients in the
@@ -2161,7 +2155,6 @@ int main(int argc, char* argv[])
 #ifndef FEATURE_NO_XEMBED
         {"embed", 'e', 0, G_OPTION_ARG_STRING, &winid, "Reparents to window specified by xid", NULL},
 #endif
-        {"incognito", 'i', 0, G_OPTION_ARG_NONE, &vb.incognito, "Run with user data read-only", NULL},
         {"profile", 'p', 0, G_OPTION_ARG_CALLBACK, (GOptionArgFunc*)profileOptionArgFunc, "Profile name", NULL},
         {"version", 'v', 0, G_OPTION_ARG_NONE, &ver, "Print version", NULL},
         {"no-maximize", 0, 0, G_OPTION_ARG_NONE, &vb.no_maximize, "Do no attempt to maximize window", NULL},

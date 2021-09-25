@@ -43,9 +43,6 @@ This will also be applied on new spawned instances.
 .I WINID
 of an XEmbed-aware application, that neovimb will use as its parent.
 .TP
-.B "\-i, \-\-incognito"
-Start an instance with user data read-only (see \fIFILES\fP section).
-.TP
 .B "\-h, \-\-help"
 Show help options.
 .TP
@@ -1564,11 +1561,9 @@ this subdirectory.
 .PD 0
 .I cookies.db
 Sqlite cookie storage.
-This file will not be touched if option \-\-incognito is set.
 .TP
 .I closed
 Holds the URIs of last closed browser windows.
-This file will not be touched if option \-\-incognito is set.
 .TP
 .TP
 .I bookmark
@@ -1576,13 +1571,9 @@ This file holds the list of bookmarked URIs with tags.
 .TP
 .I command
 box.
-This file will not be touched if option \-\-incognito is set.
 .TP
 .I queue
 Holds the read it later queue filled by `qpush'.
-.TP
-.I search
-This file will not be touched if option \-\-incognito is set.
 .PD
 .RE
 .
