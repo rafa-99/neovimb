@@ -52,7 +52,7 @@
 #define SETTING_GUI_FONT_NORMAL               "10pt monospace"
 #define SETTING_GUI_FONT_EMPH                 "bold 10pt monospace"
 #define SETTING_HOME_PAGE                     "about:blank"
-#define SETTING_DOWNLOAD_PATH                 "~/"
+#define SETTING_DOWNLOAD_PATH                 "~/Downloads"
 /* cookie-accept allowed values always, origin, never */
 #define SETTING_COOKIE_ACCEPT                 "always"
 #define SETTING_HINT_KEYS                     "0123456789"
@@ -73,3 +73,18 @@
 
 /* if set to 1 vimb will check if the webextension could be found. */
 #define CHECK_WEBEXTENSION_ON_STARTUP 1
+
+/* Auto Hide Input Bar */
+#define SETTING_HIDEINPUTBAR on
+
+/* Search Engine */
+#define SETTING_SEARCH_ENGINE "https://duckduckgo.com/html/?q=$0"
+
+/* User Agent */
+#define SETTING_USER_AGENT "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Safari/605.1.15 "
+
+/* Dark Mode */
+#define SETTING_DARK_MODE on
+
+/* Geolocation  - always/ask/never */
+#define SETTING_GEOLOCATION_ACCEPT "never"

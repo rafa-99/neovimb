@@ -79,7 +79,7 @@ void setting_init(Client *c)
     gboolean on = TRUE, off = FALSE;
 
     c->config.settings = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, (GDestroyNotify)setting_free);
-    setting_add(c, "user-agent", TYPE_CHAR, &"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Safari/605.1.15 " PROJECT "/" VERSION, webkit, 0, "user-agent");
+    setting_add(c, "user-agent", TYPE_CHAR, &SETTING_USER_AGENT PROJECT "/" VERSION, webkit, 0, "user-agent");
     /* TODO use the real names for webkit settings */
     i = 14;
     setting_add(c, "accelerated-2d-canvas", TYPE_BOOLEAN, &off, webkit, 0, "enable-accelerated-2d-canvas");
@@ -87,14 +87,14 @@ void setting_init(Client *c)
     setting_add(c, "allow-universal-access-from-file-urls", TYPE_BOOLEAN, &off, webkit, 0, "allow-universal-access-from-file-urls");
     setting_add(c, "caret", TYPE_BOOLEAN, &off, webkit, 0, "enable-caret-browsing");
     setting_add(c, "cursiv-font", TYPE_CHAR, &"serif", webkit, 0, "cursive-font-family");
-    setting_add(c, "dark-mode", TYPE_BOOLEAN, &off, dark_mode, 0, NULL);
+    setting_add(c, "dark-mode", TYPE_BOOLEAN, &SETTING_DARK_MODE, dark_mode, 0, NULL);
     setting_add(c, "default-charset", TYPE_CHAR, &"utf-8", webkit, 0, "default-charset");
     setting_add(c, "default-font", TYPE_CHAR, &"sans-serif", webkit, 0, "default-font-family");
     setting_add(c, "dns-prefetching", TYPE_BOOLEAN, &on, webkit, 0, "enable-dns-prefetching");
     i = SETTING_DEFAULT_FONT_SIZE;
     setting_add(c, "font-size", TYPE_INTEGER, &i, webkit, 0, "default-font-size");
     setting_add(c, "frame-flattening", TYPE_BOOLEAN, &off, webkit, 0, "enable-frame-flattening");
-    setting_add(c, "geolocation", TYPE_CHAR, &"ask", geolocation, FLAG_NODUP, NULL);
+    setting_add(c, "geolocation", TYPE_CHAR, &SETTING_GEOLOCATION_ACCEPT, geolocation, FLAG_NODUP, NULL);
     setting_add(c, "hardware-acceleration-policy", TYPE_CHAR, &"ondemand", hardware_acceleration_policy, FLAG_NODUP, NULL);
     setting_add(c, "header", TYPE_CHAR, &"", headers, FLAG_LIST|FLAG_NODUP, "header");
     i = 1000;
@@ -154,7 +154,7 @@ void setting_init(Client *c)
     setting_add(c, "status-bar", TYPE_BOOLEAN, &on, statusbar, 0, NULL);
     i = 1000;
     setting_add(c, "timeoutlen", TYPE_INTEGER, &i, internal, 0, &c->map.timeoutlen);
-    setting_add(c, "input-autohide", TYPE_BOOLEAN, &off, input_autohide, 0, &c->config.input_autohide);
+    setting_add(c, "input-autohide", TYPE_BOOLEAN, &SETTING_HIDEINPUTBAR, input_autohide, 0, &c->config.input_autohide);
     setting_add(c, "fullscreen", TYPE_BOOLEAN, &off, fullscreen, 0, NULL);
     setting_add(c, "show-titlebar", TYPE_BOOLEAN, &on, window_decorate, 0, NULL);
     i = 100;
@@ -180,9 +180,8 @@ void setting_init(Client *c)
     setting_add(c, "status-ssl-invalid-css", TYPE_CHAR, &SETTING_STATUS_SSL_INVLID_CSS, gui_style, 0, NULL);
 
     /* initialize the shortcuts and set the default shortcuts */
-    shortcut_add(c->config.shortcuts, "dl", "https://duckduckgo.com/html/?q=$0");
-    shortcut_add(c->config.shortcuts, "dd", "https://duckduckgo.com/?q=$0");
-    shortcut_set_default(c->config.shortcuts, "dl");
+    shortcut_add(c->config.shortcuts, "se", SETTING_SEARCH_ENGINE);
+    shortcut_set_default(c->config.shortcuts, "se");
 }
 
 VbCmdResult setting_run(Client *c, char *name, const char *param)
