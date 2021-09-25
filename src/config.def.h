@@ -90,3 +90,14 @@
 #define SETTING_DOWNLOAD_COMMAND "/bin/sh -c \"curl -sLJOC - -e '$neovimb_URI' %s\""
 
 #define SETTING_HINT_KEYS "0123456789"
+
+/* These are the three settings displayed when "status-bar-show-settings" is enabled
+ * With booleans, please use GET_BOOL and append ( ? "on" : "off" )
+ * With integers, you could just print the value and use GET_INT
+ * Strings do not need any additional modifications, use GET_CHAR */
+#define STATUS_NAME1 "js"
+#define STATUS_TYPE1 GET_BOOL(c, "scripts") ? "on" : "off"
+#define STATUS_NAME2 "cookies"
+#define STATUS_TYPE2 GET_CHAR(c, "cookie-accept")
+#define STATUS_NAME3 "storage"
+#define STATUS_TYPE3 GET_BOOL(c, "html5-local-storage") ? "on" : "off"
