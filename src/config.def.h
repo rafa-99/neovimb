@@ -88,3 +88,6 @@
 
 /* Geolocation  - always/ask/never */
 #define SETTING_GEOLOCATION_ACCEPT "never"
+
+/* JavaScript */
+#define SETTING_JAVASCRIPT_ACCEPT on
