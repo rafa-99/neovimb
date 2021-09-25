@@ -640,6 +640,13 @@ void vb_statusbar_update(Client *c)
 		c->state.scroll_percent = * (guint16*) ( &c->state.scroll_percent );
 #endif
 
+    if ( c->config.statusbar_show_settings ) {
+        /* show js, cookies, and local storage status */
+        g_string_append_printf(status, " js: %s |", GET_BOOL(c, "scripts") ? "on" : "off");
+        g_string_append_printf(status, " cookies: %s |", GET_CHAR(c, "cookie-accept") );
+        g_string_append_printf(status, " storage: %s", GET_BOOL(c, "html5-local-storage") ? "on" : "off");
+    }
+
     /* show the scroll status */
     if (c->state.scroll_max == 0) {
         g_string_append(status, " All");
