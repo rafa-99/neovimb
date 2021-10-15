@@ -107,10 +107,9 @@
 */
 #define COOKIE GET_CHAR(c, "cookie-accept")
 #define CHAR_MAP(v, i, m, d) (strcmp(v, i) == 0 ? m : (d))
-#define STATUS_VARAIBLE_SHOW "%c%c%c%c%c%c%c%c", \
+#define STATUS_VARAIBLE_SHOW "%c%c%c%c%c%c%c", \
     CHAR_MAP(COOKIE, "always", 'A', CHAR_MAP(COOKIE, "origin", '@', 'a')), \
     GET_BOOL(c, "dark-mode") ? 'D' : 'd', \
-    vb.incognito ? 'E' : 'e', \
     GET_BOOL(c, "images") ? 'I' : 'i', \
     GET_BOOL(c, "html5-local-storage") ? 'L' : 'l', \
     GET_BOOL(c, "stylesheet") ? 'M' : 'm', \
