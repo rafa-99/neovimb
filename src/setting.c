@@ -109,7 +109,7 @@ void setting_init(Client *c)
     setting_add(c, "hyperlink-auditing", TYPE_BOOLEAN, &off, webkit, 0, "enable-hyperlink-auditing");
     setting_add(c, "images", TYPE_BOOLEAN, &on, webkit, 0, "auto-load-images");
 #if WEBKIT_CHECK_VERSION(2, 30, 0)
-    setting_add(c, "intelligent-tracking-prevention", TYPE_BOOLEAN, &off, intelligent_tracking_prevention, 0, NULL);
+    setting_add(c, "intelligent-tracking-prevention", TYPE_BOOLEAN, &on, intelligent_tracking_prevention, 0, NULL);
 #endif
     setting_add(c, "javascript-can-access-clipboard", TYPE_BOOLEAN, &off, webkit, 0, "javascript-can-access-clipboard");
     setting_add(c, "javascript-can-open-windows-automatically", TYPE_BOOLEAN, &off, webkit, 0, "javascript-can-open-windows-automatically");
