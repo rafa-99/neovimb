@@ -155,7 +155,7 @@ void setting_init(Client *c)
     setting_add(c, "status-bar-show-settings", TYPE_BOOLEAN, &off, internal, 0, &c->config.statusbar_show_settings);
     /* TODO should be global and not overwritten by a new client */
     setting_add(c, "editor-command", TYPE_CHAR, &"x-terminal-emulator -e -vi '%s'", NULL, 0, NULL);
-    setting_add(c, "strict-ssl", TYPE_BOOLEAN, &on, tls_policy, 0, NULL);
+    setting_add(c, "strict-ssl", TYPE_BOOLEAN, &off, tls_policy, 0, NULL);
     setting_add(c, "status-bar", TYPE_BOOLEAN, &on, statusbar, 0, NULL);
     i = 1000;
     setting_add(c, "timeoutlen", TYPE_INTEGER, &i, internal, 0, &c->map.timeoutlen);
