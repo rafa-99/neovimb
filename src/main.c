@@ -39,7 +39,6 @@
 #include "ext-proxy.h"
 #include "handler.h"
 #include "input.h"
-#include "js.h"
 #include "main.h"
 #include "map.h"
 #include "normal.h"
