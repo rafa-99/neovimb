@@ -5,7 +5,7 @@ neovimb is a fork of [vimb](https://github.com/fanglingsu/vimb) but with a coupl
 ## dependencies
 
 - gtk+-3.0
-- webkit2gtk-4.0 >= 2.20.x
+- webkit2gtk-4.1
 - gst-libav, gst-plugins-good (optional, for media decoding among other things)
 
 ## Install
