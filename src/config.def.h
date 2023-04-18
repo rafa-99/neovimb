@@ -79,7 +79,7 @@
 /* search engine */
 #define SETTING_SEARCH_ENGINE "https://duckduckgo.com/?q=$0"
 /* user agent */
-#define SETTING_USER_AGENT "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Safari/605.1.15 "
+#define SETTING_USER_AGENT "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15 "
 /* geolocation-accept allowed values always, ask, never */
 #define SETTING_GEOLOCATION_ACCEPT "never"
 /* cookie-accept allowed values always, origin, never */
