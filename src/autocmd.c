@@ -249,9 +249,9 @@ gboolean autocmd_add(Client *c, char *name, gboolean delete)
  */
 gboolean autocmd_run(Client *c, AuEvent event, const char *uri, const char *group)
 {
-    GSList  *lg, *lc;
+    GSList  *lg, *lc, *lcc;
     AuGroup *grp;
-    AutoCmd *cmd;
+    AutoCmd *cmd, *new;
     guint bits = events[event].bits;
 
     /* if there is no autocmd for this event - skip here */
@@ -266,8 +266,19 @@ gboolean autocmd_run(Client *c, AuEvent event, const char *uri, const char *grou
         if (group && strcmp(group, grp->name)) {
             continue;
         }
-        /* test each command in group */
+
+        /* make a deep copy of grp->cmds since it can be modified by ex_run_string() below */
+        lcc = NULL;
         for (lc = grp->cmds; lc; lc = lc->next) {
+            cmd = lc->data;
+            new = new_autocmd(cmd->excmd, cmd->pattern);
+            new->bits = cmd->bits;
+            lcc = g_slist_prepend(lcc, new); // use prepend+reverse instead of append for efficiency
+        }
+        lcc = g_slist_reverse(lcc);
+
+        /* test each command in group */
+        for (lc = lcc; lc; lc = lc->next, free_autocmd(cmd)) {
             cmd = lc->data;
             /* skip if this dos not match the event bits */
             if (!(bits & cmd->bits)) {
@@ -279,6 +290,8 @@ gboolean autocmd_run(Client *c, AuEvent event, const char *uri, const char *grou
                 continue;
             }
         }
+
+        g_slist_free(lcc);
     }
 
     return true;
